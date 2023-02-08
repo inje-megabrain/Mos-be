@@ -4,6 +4,10 @@ import com.example.codebase.Jwt.JwtProvider;
 import com.example.codebase.Response.BasicResponse;
 import com.example.codebase.Service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.ResourceRegion;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 @RestController
@@ -115,10 +120,28 @@ public class FileController {
     @PostMapping("/upload")
     public ResponseEntity<?> uploadFile(HttpServletRequest request,
                                         @RequestParam("dir") String dir,
-                                        @RequestParam("file") MultipartFile file){
+                                        @RequestParam("file")MultipartFile file){
         String accessToken = request.getHeader("accessToken");
         String member_id = jwtProvider.getMemberIdFromToken(accessToken);
         return fileService.uploadFile(Long.valueOf(member_id),dir,file);
     }
 
+    @GetMapping("/image")
+    public ResponseEntity<byte[]> readImage(HttpServletRequest request,
+                                       @RequestParam String dir,
+                                       @RequestParam String imagename){
+        String accessToken = request.getHeader("accessToken");
+        String member_id = jwtProvider.getMemberIdFromToken(accessToken);
+        return fileService.readImage(Long.valueOf(member_id),dir,imagename);
+    }
+
+    @GetMapping("/video")
+    public ResponseEntity<?> playVideo(HttpServletRequest request,
+                                              @RequestParam String dir,
+                                              @RequestParam String videoname){
+
+        String accessToken = request.getHeader("accessToken");
+        String member_id = jwtProvider.getMemberIdFromToken(accessToken);
+        return fileService.playVideo(Long.valueOf(member_id),dir,videoname);
+    }
 }
