@@ -34,23 +34,20 @@ public class MemberService {
         //회원가입
         try {
             Member result = new Member();
-            Member member = memberRepository.findBymId(memberDto.getId());
-            result.setId(memberDto.getId());
-            result.setPw(memberDto.getPw());
-
             BasicResponse basicResponse = new BasicResponse();
-
-            if(member.getId().equals(memberDto.getId()) || member.getPw().equals(memberDto.getPw()))
+            if(memberRepository.findBymId(memberDto.getId())!=null){
                 basicResponse = BasicResponse.builder()
                         .code(HttpStatus.BAD_REQUEST.value())
                         .httpStatus(HttpStatus.BAD_REQUEST)
                         .message("회원가입 실패")
                         .build();
-            else {
+            }else{
 
+                result.setId(memberDto.getId());
+                result.setPw(memberDto.getPw());
                 File file = new File(rootPath + memberDto.getId());
                 file.mkdir();
-                member.setRoles(Collections.singletonList("USER")); //권한 설정
+                result.setRoles(Collections.singletonList("USER")); //권한 설정
 
                 memberRepository.save(result);
 
@@ -62,6 +59,8 @@ public class MemberService {
                         .build();
 
             }
+
+
             return new ResponseEntity<>(basicResponse, basicResponse.getHttpStatus());
             }catch(Exception e){
             throw new Exception(e.getMessage());
@@ -70,6 +69,7 @@ public class MemberService {
     public ResponseEntity<BasicResponse> login(HttpServletResponse response, MemberDto memberDto) { //로그인 API
 
            //회원가입
+
             Member member = memberRepository.findBymId(memberDto.getId());
             BasicResponse basicResponse = new BasicResponse();
 

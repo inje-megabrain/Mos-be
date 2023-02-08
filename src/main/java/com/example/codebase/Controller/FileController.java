@@ -7,7 +7,6 @@ import com.example.codebase.Service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,6 +33,15 @@ public class FileController {
         String id = jwtProvider.getIdFromToken(accessToken);
 
         return fileService.makeDir(id,dir);
+    }
+    @PostMapping("/makeFile") //---> 파일 생성하는 API
+    public ResponseEntity<BasicResponse> makeDir(HttpServletRequest request,
+                                                 @RequestParam("dir") String dir,
+                                                 @RequestParam("file") String file) throws IOException {
+        String accessToken = request.getHeader("accessToken");
+        String member_id = jwtProvider.getIdFromToken(accessToken);
+
+        return fileService.makeFile(member_id, dir, file);  //-->directory 객체 전달
     }
 
     @PostMapping("/renameFile")

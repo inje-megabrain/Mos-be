@@ -29,42 +29,71 @@ import java.util.Map;
 @Service
 public class FileService {
 
-    public static String rootPath = "/mos_file/"; //root Path
+    public static String rootPath = "/Users/leeseonghyeon/Desktop/Mega/"; //root Path
 
 
 
 
-    public ResponseEntity<BasicResponse> makeDir(String member_id, String path) throws IOException {   //폴더 생성
+    public ResponseEntity<BasicResponse> makeDir(String member_id, String dir) {   //폴더 생성
 
-        File newFile = new File(rootPath + member_id + path);
+        File newFile = new File(rootPath + member_id + dir);
         BasicResponse basicResponse = new BasicResponse();
 
-        if (!newFile.exists()) {    //파일이 존재하면
-            if (newFile.isDirectory()) {    //파일이 디렉토리(폴더)라면?
-                if (newFile.mkdir()) {  //Make Directory!
-                    basicResponse = BasicResponse.builder()
-                            .code(HttpStatus.OK.value())
-                            .httpStatus(HttpStatus.OK)
-                            .message("폴더 생성 성공")
-                            .build();
-                } else
-                    basicResponse = BasicResponse.builder()
-                            .code(HttpStatus.BAD_REQUEST.value())
-                            .httpStatus(HttpStatus.BAD_REQUEST)
-                            .message("폴더 생성 실패")
-                            .build();
-            } else if(newFile.isFile()) {//만약 파일이면!
-                newFile.createNewFile();
+        if (!newFile.exists()) {
+            try {
+                newFile.mkdir();
                 basicResponse = BasicResponse.builder()
                         .code(HttpStatus.OK.value())
                         .httpStatus(HttpStatus.OK)
-                        .message("파일 생성")
+                        .message("폴더 생성 성공")
                         .build();
-            }else basicResponse = BasicResponse.builder()
+            } catch (Exception e) {
+
+                basicResponse = BasicResponse.builder()
                         .code(HttpStatus.BAD_REQUEST.value())
                         .httpStatus(HttpStatus.BAD_REQUEST)
-                        .message("파일 이미 존재, 대체할까요?")
+                        .message("폴더 생성 실패")
                         .build();
+            }
+        }
+        else
+            basicResponse = BasicResponse.builder()
+                    .code(HttpStatus.BAD_REQUEST.value())
+                    .httpStatus(HttpStatus.BAD_REQUEST)
+                    .message("폴더 생성 실패")
+                    .build();
+        return new ResponseEntity<>(basicResponse, basicResponse.getHttpStatus());
+    }
+
+    public ResponseEntity<BasicResponse> makeFile(String member_id, String dir, String file) throws IOException { //파일 생성
+        File newDir = new File(rootPath + member_id + dir);
+
+        BasicResponse basicResponse = new BasicResponse();
+        if (!newDir.exists())
+            if (newDir.mkdir())
+                System.out.println("폴더 생성 성공");
+
+        File newFile = new File(newDir, file);
+        if (!newFile.exists()) {
+
+            try {
+                newFile.createNewFile();
+
+                basicResponse = BasicResponse.builder()
+                        .code(HttpStatus.OK.value())
+                        .httpStatus(HttpStatus.OK)
+                        .message("파일 생성 성공")
+                        .build();
+            } catch (Exception e) {
+                basicResponse = BasicResponse.builder()
+                        .code(HttpStatus.BAD_REQUEST.value())
+                        .httpStatus(HttpStatus.BAD_REQUEST)
+                        .message("파일 생성 실패")
+                        .build();
+
+            }
+
+
         }
         return new ResponseEntity<>(basicResponse, basicResponse.getHttpStatus());
     }
@@ -83,28 +112,19 @@ public class FileService {
                         .code(HttpStatus.OK.value())
                         .httpStatus(HttpStatus.OK)
                         .message("파일 이름 변경 성공")
-                        .accessToken("")
-                        .refreshToken("")
-                        .result(null)
-                        .count(1).build();
+                        .build();
             else
                 basicResponse = BasicResponse.builder()
                         .code(HttpStatus.BAD_REQUEST.value())
                         .httpStatus(HttpStatus.BAD_REQUEST)
                         .message("파일 이름 변경 실패")
-                        .accessToken("")
-                        .refreshToken("")
-                        .result(null)
-                        .count(1).build();
+                        .build();
         } else {
             basicResponse = BasicResponse.builder()
                     .code(HttpStatus.BAD_REQUEST.value())
                     .httpStatus(HttpStatus.BAD_REQUEST)
                     .message("파일 이름 변경 실패")
-                    .accessToken("")
-                    .refreshToken("")
-                    .result(null)
-                    .count(1).build();
+                    .build();
         }
         return new ResponseEntity<>(basicResponse, basicResponse.getHttpStatus());
     }
@@ -122,34 +142,25 @@ public class FileService {
                         .code(HttpStatus.OK.value())
                         .httpStatus(HttpStatus.OK)
                         .message("폴더 이름 변경 성공")
-                        .accessToken("")
-                        .refreshToken("")
-                        .result(null)
-                        .count(1).build();
+                        .build();
             else
                 basicResponse = BasicResponse.builder()
                         .code(HttpStatus.BAD_REQUEST.value())
                         .httpStatus(HttpStatus.BAD_REQUEST)
                         .message("폴더 이름 변경 실패")
-                        .accessToken("")
-                        .refreshToken("")
-                        .result(null)
-                        .count(1).build();
+                        .build();
         } else {
             basicResponse = BasicResponse.builder()
                     .code(HttpStatus.BAD_REQUEST.value())
                     .httpStatus(HttpStatus.BAD_REQUEST)
                     .message("폴더 이름 변경 실패")
-                    .accessToken("")
-                    .refreshToken("")
-                    .result(null)
-                    .count(1).build();
+                    .build();
         }
         return new ResponseEntity<>(basicResponse, basicResponse.getHttpStatus());
     }
 
     public ResponseEntity<BasicResponse> getDir(String member_id, String dir) {    //폴더 구조 가져오기
-            File newDir = new File(rootPath +member_id+"/"+ dir);
+            File newDir = new File(rootPath + dir);
 
             File[] fileList = newDir.listFiles();
 
@@ -161,30 +172,38 @@ public class FileService {
             for (File file : fileList) {
                 getDirectory insert = new getDirectory();
                 if (file.exists()) {
-
                     String fileName = file.getName();
 
-                    if(file.isFile()) {
-                        String[] name = fileName.split(".");
-                        if(name.length!=0) {
-                            insert = getDirectory.builder()
-                                    .isDir(false)
-                                    .name(name[0])
-                                    .ext(name[1])
-                                    .build();
-                            list.add(insert);
+                    if (file.isFile()) {
+                        int cnt=0;
+                        char []ch = fileName.toCharArray();
+                        for(int i= ch.length-1; i>=0; i--) {
+                            if(ch[i]=='.')
+                                cnt=i;
                         }
-                    }
-                    else if(file.isDirectory()){
+
+                        char []ex = new char[ch.length-(cnt+1)];
+                        for(int i=cnt+1; i<ch.length; i++){
+                            ex[i-cnt-1]=ch[i];
+                        }
+
+                        insert = getDirectory.builder()
+                                .isDir(false)
+                                .name(fileName)
+                                .ext(String.valueOf(ex))
+                                .build();
+                        list.add(insert);
+                    } else if(file.isDirectory()){
                         insert = getDirectory.builder()
                                 .isDir(true)
                                 .name(fileName)
                                 .ext("Directory")
                                 .build();
                         list.add(insert);
-                        }
                     }
                 }
+            }
+
 
             basicResponse = BasicResponse.builder()
                     .code(HttpStatus.OK.value())
@@ -198,7 +217,7 @@ public class FileService {
     //디렉토리 삭제(하위폴더,파일 모두 삭제됨)
 
     public ResponseEntity removeDir(String member_id, String dir, String rm) {
-        File rm_dir = new File(rootPath +member_id+"/"+ dir);
+        File rm_dir = new File(rootPath +member_id+ dir);
         String response = new String();
 
         if (rm_dir.exists() && rm_dir.isDirectory()) {
