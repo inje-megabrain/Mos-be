@@ -222,6 +222,7 @@ public class FileService {
     public ResponseEntity removeDir(Long member_id, String dir, String rm) {
         File rm_dir = new File(rootPath + dir + "/" + rm);
         String response;
+        
         if (rm_dir.exists() && rm_dir.isDirectory()) {
             try {
                 Files.walk(rm_dir.toPath())
