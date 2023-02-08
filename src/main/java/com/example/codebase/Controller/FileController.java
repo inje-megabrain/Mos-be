@@ -71,13 +71,26 @@ public class FileController {
         return fileService.getDir(Long.valueOf(member_id), dir);
     }
 
+
+    @PostMapping("/moveDir")
+    public ResponseEntity<BasicResponse> getDir(HttpServletRequest request,
+                                                @RequestParam("dir") String dir,
+                                                @RequestParam("mv_dir") String mv_dir) throws IOException {
+        return fileService.moveDir(Long.valueOf(member_id), dir, mv_dir);
+    }
+  
     @PostMapping("/removeDir")
     public ResponseEntity<?> removeDir(HttpServletRequest request,
                                                    @RequestParam("dir") String dir){
+      
         String accessToken = request.getHeader("accessToken");
         String member_id = jwtProvider.getMemberIdFromToken(accessToken);
         return fileService.removeDir(Long.valueOf(member_id),dir);
     }
+
+
+
+
 
     @PostMapping("/removeFile")
     public ResponseEntity<?> removeFile(HttpServletRequest request,
@@ -96,4 +109,5 @@ public class FileController {
         String member_id = jwtProvider.getMemberIdFromToken(accessToken);
         return fileService.uploadFile(Long.valueOf(member_id),dir,file);
     }
+
 }
