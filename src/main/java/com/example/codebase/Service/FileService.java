@@ -4,25 +4,22 @@ import com.example.codebase.Response.BasicResponse;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.FileUrlResource;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.ResourceRegion;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.print.DocFlavor;
-import javax.servlet.http.HttpServletRequest;
 import java.io.*;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class FileService {
     //private String rootPath = "/mos_file/"; //root Path
-    private String rootPath = "C:/Users/mun/Desktop/파일저장테스트/";
-    //private String rootPath = "/Users/leeseonghyeon/Desktop/Mega/";
+
+    private String rootPath = "/Users/leeseonghyeon/Desktop/"; //root Path
+
+
 
     public ResponseEntity<BasicResponse> makeDir(Long member_id, String dir) {   //폴더 생성
 
@@ -235,7 +232,66 @@ public class FileService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    //파일삭제
+
+
+    public ResponseEntity<BasicResponse> moveDir(Long member_id, String dir, String mv_dir) throws IOException {
+        BasicResponse basicResponse = new BasicResponse();
+
+        char[] ch = dir.toCharArray();
+
+        int cnt=0;
+
+        for(int i=ch.length-1; i>=0; i--){
+            if(ch[i]=='/'){
+                cnt=i+1;
+                break;
+            }
+        }
+        char[] result= new char[ch.length-cnt];
+
+        for(int i=cnt; i<ch.length; i++) {
+            result[i-cnt]=ch[i];
+        }
+
+        String path = String.valueOf(result);
+       
+        File from = new File(rootPath+dir);
+        File to = new File(rootPath+mv_dir+"/"+path);
+ 
+            try {
+                if(from.isFile()){
+                    System.out.println("!");
+                    FileUtils.copyFile(from, to);
+                    FileUtils.deleteQuietly(from);
+                }
+                else {
+                    FileUtils.copyDirectory(from, to);
+                    FileUtils.deleteDirectory(from);
+
+                }
+                basicResponse = BasicResponse.builder()
+                        .code(HttpStatus.OK.value())
+                        .httpStatus(HttpStatus.OK)
+                        .message("파일 이동 완료")
+                        .accessToken("")
+                        .refreshToken("")
+                        .result(null)
+                        .count(1).build();
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+                basicResponse = BasicResponse.builder()
+                        .code(HttpStatus.BAD_REQUEST.value())
+                        .httpStatus(HttpStatus.BAD_REQUEST)
+                        .message("파일 이동 실패")
+                        .accessToken("")
+                        .refreshToken("")
+                        .result(null).count(1).build();
+            }
+
+
+        return new ResponseEntity<>(basicResponse, basicResponse.getHttpStatus());
+    }
+
     public ResponseEntity removeFile(Long member_id, String dir, String file) {
         File rm_file = new File(rootPath + dir + "/" + file);
         String response = new String();
