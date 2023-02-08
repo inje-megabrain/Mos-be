@@ -217,7 +217,7 @@ public class FileService {
     }
 
     //디렉토리 삭제(하위폴더,파일 모두 삭제됨)
-    public ResponseEntity removeDir(Long member_id, String dir) {
+    public ResponseEntity removeDir(Long member_id, String dir, String rm) {
         File rm_dir = new File(rootPath + dir);
         String response = new String();
         if (rm_dir.exists() && rm_dir.isDirectory()) {

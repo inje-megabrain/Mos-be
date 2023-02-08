@@ -141,12 +141,12 @@ public class FileController {
         return fileService.playVideo(Long.valueOf(member_id),dir,videoname);
     }
 
-    @GetMapping("/getAttribute")
+    /*@GetMapping("/getAttribute")
     public ResponseEntity<AttributesResponse> getAttribute(HttpServletRequest request,
                                                            @RequestParam("file") String file) throws IOException {
         String accessToken = request.getHeader("accessToken");
         String member_id = jwtProvider.getMemberIdFromToken(accessToken);
         return fileService.getAttribute(Long.valueOf(member_id), file);
-    }
+    }*/
 
 }
