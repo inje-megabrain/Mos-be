@@ -130,12 +130,13 @@ public class FileService {
     }
 
     public ResponseEntity<BasicResponse> renameDir(String member_id, String dir, String rename) {  //폴더 이름 변경
-        File newDir = new File(rootPath +member_id+ dir);
+        File newDir = new File(rootPath+dir);
 
         BasicResponse basicResponse = new BasicResponse();
 
         File changeFile = new File(rootPath, rename); //변경할 이름
-
+        System.out.println(newDir);
+        System.out.println(changeFile);
         if (newDir.exists()) {    // 파일이 존재할 때만 이름 변경
             if (newDir.renameTo(changeFile))
                 basicResponse = BasicResponse.builder()
@@ -160,7 +161,7 @@ public class FileService {
     }
 
     public ResponseEntity<BasicResponse> getDir(String member_id, String dir) {    //폴더 구조 가져오기
-            File newDir = new File(rootPath + dir);
+            File newDir = new File(rootPath +dir);
 
             File[] fileList = newDir.listFiles();
 
@@ -261,9 +262,10 @@ public class FileService {
 
         String path = String.valueOf(result);
 
-        File from = new File(rootPath +member_id+"/"+ dir);
-        File to = new File(rootPath +member_id+"/"+ dir+"/"+path);
-
+        File from = new File(rootPath +dir);
+        File to = new File(rootPath + dir+path);
+        System.out.println(from);
+        System.out.println(to);
             try {
                 if(from.isFile()){
                     System.out.println("!");
@@ -317,7 +319,7 @@ public class FileService {
         String response = new String();
         if (!file.isEmpty()) {
             try {
-                file.transferTo(new File(rootPath +member_id+"/"+ dir+"/" + file.getOriginalFilename()));
+                file.transferTo(new File(rootPath +dir+ file.getOriginalFilename()));
                 response = file.getOriginalFilename();
             } catch (IOException e) {
                 response = "파일 업로드 실패";
