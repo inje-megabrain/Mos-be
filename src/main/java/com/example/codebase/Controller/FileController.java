@@ -9,6 +9,7 @@ import org.springframework.core.io.support.ResourceRegion;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -88,11 +89,12 @@ public class FileController {
   
     @PostMapping("/removeDir")
     public ResponseEntity<?> removeDir(HttpServletRequest request,
-                                                   @RequestParam("dir") String dir){
+                                       @RequestParam("dir") String dir,
+                                       @RequestParam("rm") String rm){
       
         String accessToken = request.getHeader("accessToken");
         String member_id = jwtProvider.getMemberIdFromToken(accessToken);
-        return fileService.removeDir(Long.valueOf(member_id),dir);
+        return fileService.removeDir(Long.valueOf(member_id),dir,rm);
     }
 
     @PostMapping("/copy")
@@ -103,7 +105,14 @@ public class FileController {
         String member_id = jwtProvider.getMemberIdFromToken(accessToken);
         return fileService.copy(Long.valueOf(member_id), dir, copyDir);
     }
-
+    @PostMapping("/check")
+    public ResponseEntity<?> check(HttpServletRequest request,
+                                   @RequestParam String dir,
+                                   @RequestParam String cp){
+        String accessToken = request.getHeader("accessToken");
+        String member_id = jwtProvider.getMemberIdFromToken(accessToken);
+        return fileService.check(Long.valueOf(member_id), dir, cp);
+    }
 
 
 
