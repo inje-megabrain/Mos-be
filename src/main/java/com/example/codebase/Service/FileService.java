@@ -29,9 +29,7 @@ import java.util.Map;
 @Service
 public class FileService {
 
-    public static String rootPath = "/Users/leeseonghyeon/Desktop/Mega/"; //root Path
-
-
+    public static String rootPath = "/mos_file/"; //root Path
 
 
     public ResponseEntity<BasicResponse> makeDir(String member_id, String dir) {   //폴더 생성
@@ -56,8 +54,7 @@ public class FileService {
                         .message("폴더 생성 실패")
                         .build();
             }
-        }
-        else
+        } else
             basicResponse = BasicResponse.builder()
                     .code(HttpStatus.BAD_REQUEST.value())
                     .httpStatus(HttpStatus.BAD_REQUEST)
@@ -100,7 +97,7 @@ public class FileService {
     }
 
     public ResponseEntity<BasicResponse> renameFile(String member_id, String dir, String file, String rename) { //파일 이름 변경
-        File newDir = new File(rootPath + member_id+dir);
+        File newDir = new File(rootPath + member_id + dir);
         File newFile = new File(newDir, file);
 
         BasicResponse basicResponse = new BasicResponse();
@@ -131,7 +128,7 @@ public class FileService {
     }
 
     public ResponseEntity<BasicResponse> renameDir(String member_id, String dir, String rename) {  //폴더 이름 변경
-        File newDir = new File(rootPath+dir);
+        File newDir = new File(rootPath + dir);
 
         BasicResponse basicResponse = new BasicResponse();
 
@@ -162,7 +159,7 @@ public class FileService {
     }
 
     public ResponseEntity<BasicResponse> getDir(String member_id, String dir) {    //폴더 구조 가져오기
-        File newDir = new File(rootPath +member_id+"/"+ dir);
+        File newDir = new File(rootPath + member_id + dir);
 
         File[] fileList = newDir.listFiles();
 
@@ -170,28 +167,34 @@ public class FileService {
 
         List<getDirectory> list = new ArrayList<getDirectory>();
 
-
-        for (File file : fileList) {
-            getDirectory insert = new getDirectory();
-            if (file.exists()) {
-
-                String fileName = file.getName();
-
-                if(file.isFile()) {
-                    String[] name = fileName.split(".");
-                    if(name.length!=0) {
-                        insert = getDirectory.builder()
-                                .isDir(false)
-                                .name(name[0])
-                                .ext(name[1])
-                                .build();
-                        list.add(insert);
-                    }
-                }
-                else if(file.isDirectory()){
+        if (fileList != null) {
+            for (File file : fileList) {
+                getDirectory insert = new getDirectory();
+                if (file.getName().contains(".txt")) {
+                    insert = getDirectory.builder()
+                            .isDir(false)
+                            .name(file.getName())
+                            .ext("txt")
+                            .build();
+                    list.add(insert);
+                } else if (file.getName().contains(".png")) {
+                    insert = getDirectory.builder()
+                            .isDir(false)
+                            .name(file.getName())
+                            .ext("png")
+                            .build();
+                    list.add(insert);
+                } else if (file.getName().contains(".jpg")) {
+                    insert = getDirectory.builder()
+                            .isDir(false)
+                            .name(file.getName())
+                            .ext("jpg")
+                            .build();
+                    list.add(insert);
+                } else  {
                     insert = getDirectory.builder()
                             .isDir(true)
-                            .name(fileName)
+                            .name(file.getName())
                             .ext("Directory")
                             .build();
                     list.add(insert);
