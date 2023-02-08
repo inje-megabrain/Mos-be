@@ -323,6 +323,68 @@ public class FileService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+
+    public ResponseEntity<BasicResponse> copy(Long member_id, String dir, String copyDir) {
+        BasicResponse basicResponse = new BasicResponse();
+
+        char[] ch = dir.toCharArray();
+
+        int cnt=0;
+
+        for(int i=ch.length-1; i>=0; i--){
+            if(ch[i]=='/'){
+                cnt=i+1;
+                break;
+            }
+        }
+        char[] result= new char[ch.length-cnt];
+
+        for(int i=cnt; i<ch.length; i++) {
+            result[i-cnt]=ch[i];
+        }
+
+        String path = String.valueOf(result);
+
+        File from = new File(rootPath+dir);
+        File to = new File(rootPath+copyDir+"/"+path);
+        System.out.println(from);
+        System.out.println(to);
+        try {
+            if(from.equals(to))
+                to.renameTo(new File(from.getPath() + "복사본"));
+            if(from.isFile()){
+
+                FileUtils.copyFile(from, to);
+            }
+            else {
+                FileUtils.copyDirectory(from, to);
+            }
+            basicResponse = BasicResponse.builder()
+                    .code(HttpStatus.OK.value())
+                    .httpStatus(HttpStatus.OK)
+                    .message("파일 이동 완료")
+                    .accessToken("")
+                    .refreshToken("")
+                    .result(null)
+                    .count(1).build();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            basicResponse = BasicResponse.builder()
+                    .code(HttpStatus.BAD_REQUEST.value())
+                    .httpStatus(HttpStatus.BAD_REQUEST)
+                    .message("파일 이동 실패")
+                    .accessToken("")
+                    .refreshToken("")
+                    .result(null).count(1).build();
+        }
+
+
+        return new ResponseEntity<>(basicResponse, basicResponse.getHttpStatus());
+
+
+
+    }
+
     //이미지 읽어오기
     public ResponseEntity readImage(Long member_id, String dir, String image_name) {
         String path = rootPath + dir + image_name;
@@ -358,5 +420,6 @@ public class FileService {
             return new ResponseEntity<>("실행 할수 없는 확장자",HttpStatus.OK);
         }
     }
+
 
 }

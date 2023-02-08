@@ -2,6 +2,7 @@ package com.example.codebase.Service;
 
 import com.example.codebase.Jwt.JwtProvider;
 import com.example.codebase.Model.Dao.Member;
+import com.example.codebase.Model.Dto.MemberDto;
 import com.example.codebase.Repository.MemberRepository;
 import com.example.codebase.Response.BasicResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +25,12 @@ public class MemberService {
         this.memberRepository = memberRepository;
     }
 
-    public ResponseEntity<BasicResponse> join(HttpServletResponse response, String id, String pw) throws Exception {
+    public ResponseEntity<BasicResponse> join(HttpServletResponse response, MemberDto memberDto) throws Exception {
         //회원가입
         try {
             Member member = new Member();
-            member.setId(id);
-            member.setPw(pw);
+            member.setId(memberDto.getId());
+            member.setPw(memberDto.getPw());
 
             member.setRoles(Collections.singletonList("USER")); //권한 설정
 
@@ -63,11 +64,11 @@ public class MemberService {
             throw new Exception(e.getMessage());
         }
     }
-    public ResponseEntity<BasicResponse> login(Long member_id, String id, String pw)  { //로그인 API
+    public ResponseEntity<BasicResponse> login(Long member_id, MemberDto memberDto)  { //로그인 API
         Member member = memberRepository.findById(member_id).orElseGet(Member::new);
 
         BasicResponse basicResponse = new BasicResponse();
-        if(member==null || !member.getId().equals(id) || !member.getPw().equals(pw)){
+        if(member==null || !member.getId().equals(memberDto.getId()) || !member.getPw().equals(memberDto.getPw())){
             basicResponse = BasicResponse.builder()
                     .code(HttpStatus.BAD_REQUEST.value())
                     .httpStatus(HttpStatus.BAD_REQUEST)

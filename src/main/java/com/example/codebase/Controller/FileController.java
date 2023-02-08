@@ -95,6 +95,15 @@ public class FileController {
         return fileService.removeDir(Long.valueOf(member_id),dir);
     }
 
+    @PostMapping("/copy")
+    public ResponseEntity<BasicResponse> copy(HttpServletRequest request,
+                                              @RequestParam("dir") String dir,
+                                              @RequestParam("copyDir") String copyDir) throws IOException {
+        String accessToken = request.getHeader("accessToken");
+        String member_id = jwtProvider.getMemberIdFromToken(accessToken);
+        return fileService.copy(Long.valueOf(member_id), dir, copyDir);
+    }
+
 
 
 
