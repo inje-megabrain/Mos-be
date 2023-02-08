@@ -27,8 +27,6 @@ public class MemberController {
     @PostMapping("/login") //로그인 API
     public ResponseEntity<BasicResponse> login(HttpServletResponse response,
                                                @RequestBody MemberDto memberDto) {
-
-
         return memberService.login(response, memberDto);
     }
 

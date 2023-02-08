@@ -2,6 +2,7 @@ package com.example.codebase.Service;
 
 import com.example.codebase.Response.AttributesResponse;
 import com.example.codebase.Response.BasicResponse;
+import com.example.codebase.Response.getDirectory;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.core.io.FileSystemResource;
@@ -15,21 +16,27 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
 @Service
 public class FileService {
-    //private String rootPath = "/mos_file/"; //root Path
+    private String rootPath = "/mos_file"; //root Path
     //private String rootPath = "/Users/leeseonghyeon/Desktop/"; //root Path
-    private String rootPath = "C:/Users/mun/Desktop/파일저장테스트/"; //root Path
+    //private String rootPath = "C:/Users/mun/Desktop/파일저장테스트"; //root Path
 
 
 
-    public ResponseEntity<BasicResponse> makeDir(Long member_id, String dir) {   //폴더 생성
+    public ResponseEntity<BasicResponse> makeDir(String member_id, String dir) {   //폴더 생성
 
-        File newFile = new File(rootPath + dir);
+        File newFile = new File(rootPath + member_id + dir);
         BasicResponse basicResponse = new BasicResponse();
 
         if (!newFile.exists()) {
@@ -195,40 +202,56 @@ public class FileService {
 
             BasicResponse basicResponse = new BasicResponse();
 
-            List<String> list = new ArrayList<>();
+            List<getDirectory> list = new ArrayList<getDirectory>();
+
 
             for (File file : fileList) {
+                getDirectory insert = new getDirectory();
                 if (file.exists()) {
 
                     String fileName = file.getName();
 
-                    list.add(fileName);
+                    if(file.isFile()) {
+                        String[] name = fileName.split(".");
+                        if(name.length!=0) {
+                            insert = getDirectory.builder()
+                                    .isDir(false)
+                                    .name(name[0])
+                                    .ext(name[1])
+                                    .build();
+                            list.add(insert);
+                        }
+                    }
+                    else if(file.isDirectory()){
+                        insert = getDirectory.builder()
+                                .isDir(true)
+                                .name(fileName)
+                                .ext("Directory")
+                                .build();
+                        list.add(insert);
+                        }
+                    }
                 }
-
-            }
 
             basicResponse = BasicResponse.builder()
                     .code(HttpStatus.OK.value())
                     .httpStatus(HttpStatus.OK)
                     .message("폴더 내부 구조 확인")
-                    .accessToken("")
-                    .refreshToken("")
                     .result(list)
-                    .count(1).build();
+                    .count(list.size()).build();
             return new ResponseEntity<>(basicResponse, basicResponse.getHttpStatus());
-
-
-
-
     }
 
     //디렉토리 삭제(하위폴더,파일 모두 삭제됨)
     public ResponseEntity removeDir(Long member_id, String dir, String rm) {
-        File rm_dir = new File(rootPath + dir);
-        String response = new String();
+        File rm_dir = new File(rootPath + dir + "/" + rm);
+        String response;
         if (rm_dir.exists() && rm_dir.isDirectory()) {
             try {
-                FileUtils.deleteDirectory(rm_dir);
+                Files.walk(rm_dir.toPath())
+                        .sorted(Comparator.reverseOrder())
+                        .map(Path::toFile)
+                        .forEach(File::delete);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -394,6 +417,29 @@ public class FileService {
 
     }
 
+    //텍스트 읽어오기
+    public ResponseEntity readFile(Long member_id,String dir, String filename){
+        try {
+            File file = new File(rootPath + dir + "/" +filename);
+            String ext = FilenameUtils.getExtension(file.getPath());
+
+            //예외처리
+            if(!ext.equals("txt")) return new ResponseEntity<>("읽을 수 없는 파일입니다.",HttpStatus.OK);
+
+            FileReader fileReader = new FileReader(file);
+            int singleCh = 0;
+            String txt = "";
+            while((singleCh=fileReader.read())!=-1){
+                txt+=(char)singleCh;
+            }
+            fileReader.close();
+            return new ResponseEntity<>(txt,HttpStatus.OK);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
     //이미지 읽어오기
     public ResponseEntity readImage(Long member_id, String dir, String image_name) {
         String path = rootPath + dir + image_name;

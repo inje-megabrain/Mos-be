@@ -33,7 +33,7 @@ public class FileController {
         String accessToken = request.getHeader("accessToken");
         String member_id = jwtProvider.getMemberIdFromToken(accessToken);
 
-        return fileService.makeDir(Long.valueOf(member_id),dir);
+        return fileService.makeDir(member_id,dir);
     }
 
     @PostMapping("/makeFile") //---> 파일 생성하는 API
@@ -141,6 +141,14 @@ public class FileController {
         return fileService.playVideo(Long.valueOf(member_id),dir,videoname);
     }
 
+    @GetMapping("/file")
+    public ResponseEntity<?> readFile(HttpServletRequest request,
+                                      @RequestParam String dir,
+                                      @RequestParam String filename){
+        String accessToken = request.getHeader("accessToken");
+        String member_id = jwtProvider.getMemberIdFromToken(accessToken);
+        return fileService.readFile(Long.valueOf(member_id),dir,filename);
+    }
     @GetMapping("/getAttribute")
     public ResponseEntity<AttributesResponse> getAttribute(HttpServletRequest request,
                                                            @RequestParam("file") String file) throws IOException {
