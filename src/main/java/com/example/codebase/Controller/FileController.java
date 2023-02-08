@@ -33,7 +33,7 @@ public class FileController {
         String accessToken = request.getHeader("accessToken");
         String member_id = jwtProvider.getMemberIdFromToken(accessToken);
 
-        return fileService.makeDir(Long.valueOf(member_id),dir);
+        return fileService.makeDir(member_id,dir);
     }
 
     @PostMapping("/makeFile") //---> 파일 생성하는 API
