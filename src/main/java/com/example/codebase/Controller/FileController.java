@@ -76,6 +76,8 @@ public class FileController {
     public ResponseEntity<BasicResponse> getDir(HttpServletRequest request,
                                                 @RequestParam("dir") String dir,
                                                 @RequestParam("mv_dir") String mv_dir) throws IOException {
+        String accessToken = request.getHeader("accessToken");
+        String member_id = jwtProvider.getMemberIdFromToken(accessToken);
         return fileService.moveDir(Long.valueOf(member_id), dir, mv_dir);
     }
   
@@ -86,6 +88,15 @@ public class FileController {
         String accessToken = request.getHeader("accessToken");
         String member_id = jwtProvider.getMemberIdFromToken(accessToken);
         return fileService.removeDir(Long.valueOf(member_id),dir);
+    }
+
+    @PostMapping("/copy")
+    public ResponseEntity<BasicResponse> copy(HttpServletRequest request,
+                                              @RequestParam("dir") String dir,
+                                              @RequestParam("copyDir") String copyDir) throws IOException {
+        String accessToken = request.getHeader("accessToken");
+        String member_id = jwtProvider.getMemberIdFromToken(accessToken);
+        return fileService.copy(Long.valueOf(member_id), dir, copyDir);
     }
 
 
