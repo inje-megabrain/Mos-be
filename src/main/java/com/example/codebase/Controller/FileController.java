@@ -1,6 +1,7 @@
 package com.example.codebase.Controller;
 
 import com.example.codebase.Jwt.JwtProvider;
+import com.example.codebase.Response.AttributesResponse;
 import com.example.codebase.Response.BasicResponse;
 import com.example.codebase.Service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -141,4 +142,13 @@ public class FileController {
         String member_id = jwtProvider.getMemberIdFromToken(accessToken);
         return fileService.playVideo(Long.valueOf(member_id),dir,videoname);
     }
+
+    @GetMapping("/getAttribute")
+    public ResponseEntity<AttributesResponse> getAttribute(HttpServletRequest request,
+                                                           @RequestParam("file") String file) throws IOException {
+        String accessToken = request.getHeader("accessToken");
+        String member_id = jwtProvider.getMemberIdFromToken(accessToken);
+        return fileService.getAttribute(Long.valueOf(member_id), file);
+    }
+
 }
