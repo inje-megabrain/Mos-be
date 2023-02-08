@@ -8,11 +8,13 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class FileService {
     private String rootPath = "/mos_file/"; //root Path
+    //private String rootPath = "/Users/leeseonghyeon/Desktop/Mega/";
 
     public ResponseEntity<BasicResponse> makeDir(Long member_id, String dir) {   //폴더 생성
 
@@ -41,7 +43,14 @@ public class FileService {
                         .count(1).build();
         }
         else{
-            System.out.println("폴더가 이미 존재합니다");
+            basicResponse = BasicResponse.builder()
+                    .code(HttpStatus.BAD_REQUEST.value())
+                    .httpStatus(HttpStatus.BAD_REQUEST)
+                    .message("파일 이미 존재")
+                    .accessToken("")
+                    .refreshToken("")
+                    .result(null)
+                    .count(1).build();
 
         }
         return new ResponseEntity<>(basicResponse, basicResponse.getHttpStatus());
@@ -79,7 +88,15 @@ public class FileService {
 
         }
         else{
-            System.out.println("파일이 이미 존재합니다");
+            basicResponse = BasicResponse.builder()
+                    .code(HttpStatus.BAD_REQUEST.value())
+                    .httpStatus(HttpStatus.BAD_REQUEST)
+                    .message("파일 이미 존재")
+                    .accessToken("")
+                    .refreshToken("")
+                    .result(null)
+                    .count(1).build();
+
         }
         return new ResponseEntity<>(basicResponse, basicResponse.getHttpStatus());
     }
@@ -170,7 +187,7 @@ public class FileService {
 
         BasicResponse basicResponse = new BasicResponse();
 
-        List<String> list = null;
+        List<String> list = new ArrayList<>();
 
         for(File file : fileList) {
             if(file.exists()) {
@@ -178,7 +195,6 @@ public class FileService {
                 String fileName = file.getName();
 
                 list.add(fileName);
-                System.out.println(fileName);
                 }
 
             }
@@ -195,21 +211,4 @@ public class FileService {
         return new ResponseEntity<>(basicResponse, basicResponse.getHttpStatus());
     }
 
-
-    /*
-    public void moveDir(Long member_id, String dir, String mv_dir) throws IOException {
-        BasicResponse basicResponse = new BasicResponse();
-
-        File src = new File(rootPath+dir);
-        File dst = new File(rootPath+mv_dir;
-        try {
-            FileUtils.moveFile(src,dst);
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-        return new ResponseEntity<>(basicResponse, basicResponse.getHttpStatus());
-    }
-
-     */
 }
