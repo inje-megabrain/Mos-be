@@ -12,15 +12,17 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.*;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
 public class FileService {
     //private String rootPath = "/mos_file/"; //root Path
     //private String rootPath = "/Users/leeseonghyeon/Desktop/"; //root Path
-    private String rootPath = "C:/Users/mun/Desktop/파일저장테스트/"; //root Path
+    private String rootPath = "C:/Users/mun/Desktop/파일저장테스트"; //root Path
 
 
 
@@ -219,10 +221,13 @@ public class FileService {
     //디렉토리 삭제(하위폴더,파일 모두 삭제됨)
     public ResponseEntity removeDir(Long member_id, String dir, String rm) {
         File rm_dir = new File(rootPath + dir + "/" + rm);
-        String response = new String();
+        String response;
         if (rm_dir.exists() && rm_dir.isDirectory()) {
             try {
-                FileUtils.deleteDirectory(rm_dir);
+                Files.walk(rm_dir.toPath())
+                        .sorted(Comparator.reverseOrder())
+                        .map(Path::toFile)
+                        .forEach(File::delete);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
