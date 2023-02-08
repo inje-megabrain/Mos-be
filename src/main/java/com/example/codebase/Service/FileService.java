@@ -325,12 +325,6 @@ public class FileService {
         }
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-    public ResponseEntity check(Long member_id,String dir, String cp){
-        File f1 = new File(rootPath+dir);
-        File f2 = new File(rootPath+cp);
-        String s = f1.getName()+f2.getName();
-        return new ResponseEntity<>(s,HttpStatus.OK);
-    }
     public ResponseEntity copy(Long member_id, String dir, String copyDir) {
 
         File from = new File(rootPath+dir);

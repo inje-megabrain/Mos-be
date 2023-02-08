@@ -105,17 +105,6 @@ public class FileController {
         String member_id = jwtProvider.getMemberIdFromToken(accessToken);
         return fileService.copy(Long.valueOf(member_id), dir, copyDir);
     }
-    @PostMapping("/check")
-    public ResponseEntity<?> check(HttpServletRequest request,
-                                   @RequestParam String dir,
-                                   @RequestParam String cp){
-        String accessToken = request.getHeader("accessToken");
-        String member_id = jwtProvider.getMemberIdFromToken(accessToken);
-        return fileService.check(Long.valueOf(member_id), dir, cp);
-    }
-
-
-
 
     @PostMapping("/removeFile")
     public ResponseEntity<?> removeFile(HttpServletRequest request,
