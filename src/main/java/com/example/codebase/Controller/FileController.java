@@ -86,12 +86,11 @@ public class FileController {
   
     @PostMapping("/removeDir")
     public ResponseEntity<?> removeDir(HttpServletRequest request,
-                                       @RequestParam("dir") String dir,
-                                       @RequestParam("rm") String rm){
+                                       @RequestParam("rm_dir") String rm_dir){
       
         String accessToken = request.getHeader("accessToken");
         String member_id = jwtProvider.getIdFromToken(accessToken);
-        return fileService.removeDir(member_id,dir,rm);
+        return fileService.removeDir(member_id,rm_dir);
     }
 
     @PostMapping("/copy")
@@ -105,11 +104,10 @@ public class FileController {
 
     @PostMapping("/removeFile")
     public ResponseEntity<?> removeFile(HttpServletRequest request,
-                                       @RequestParam("dir") String dir,
                                        @RequestParam("file") String file){
         String accessToken = request.getHeader("accessToken");
         String member_id = jwtProvider.getIdFromToken(accessToken);
-        return fileService.removeFile(member_id,dir,file);
+        return fileService.removeFile(member_id,file);
     }
 
     @PostMapping("/upload")
@@ -123,11 +121,10 @@ public class FileController {
 
     @GetMapping("/image")
     public ResponseEntity<byte[]> readImage(HttpServletRequest request,
-                                       @RequestParam String dir,
-                                       @RequestParam String imagename){
+                                       @RequestParam String imagepath){
         String accessToken = request.getHeader("accessToken");
         String member_id = jwtProvider.getIdFromToken(accessToken);
-        return fileService.readImage(member_id,dir,imagename);
+        return fileService.readImage(member_id,imagepath);
     }
 
     @GetMapping("/video")
@@ -142,11 +139,10 @@ public class FileController {
 
     @GetMapping("/file")
     public ResponseEntity<?> readFile(HttpServletRequest request,
-                                      @RequestParam String dir,
                                       @RequestParam String filename){
         String accessToken = request.getHeader("accessToken");
         String member_id = jwtProvider.getIdFromToken(accessToken);
-        return fileService.readFile(Long.valueOf(member_id),dir,filename);
+        return fileService.readFile(Long.valueOf(member_id),filename);
     }
     @GetMapping("/getAttribute")
     public ResponseEntity<AttributesResponse> getAttribute(HttpServletRequest request,

@@ -30,7 +30,7 @@ import java.util.Map;
 public class FileService {
 
     //public static String rootPath = "/Users/leeseonghyeon/Desktop/Mega/"; //root Path
-    public static String rootPath = "/mos_data/"; //root Path
+    public static String rootPath = "/mos_file/"; //root Path
 
 
 
@@ -213,13 +213,13 @@ public class FileService {
 
     //디렉토리 삭제(하위폴더,파일 모두 삭제됨)
 
-    public ResponseEntity removeDir(String member_id, String dir, String rm) {
-        File rm_dir = new File(rootPath +member_id+ dir);
+    public ResponseEntity removeDir(String member_id, String rm_dir) {
+        File rm = new File(rootPath +member_id+ rm_dir);
         String response = new String();
 
-        if (rm_dir.exists() && rm_dir.isDirectory()) {
+        if (rm.exists() && rm.isDirectory()) {
             try {
-                Files.walk(rm_dir.toPath())
+                Files.walk(rm.toPath())
                         .sorted(Comparator.reverseOrder())
                         .map(Path::toFile)
                         .forEach(File::delete);
@@ -227,7 +227,7 @@ public class FileService {
                 throw new RuntimeException(e);
             }
             response = "폴더 삭제완료";
-        } else if (rm_dir.exists()) {
+        } else if (rm.exists()) {
             response = "폴더가 아닌 파일 이름";
         } else {
             response = "존재하지 않는 폴더";
@@ -296,8 +296,8 @@ public class FileService {
         return new ResponseEntity<>(basicResponse, basicResponse.getHttpStatus());
     }
 
-    public ResponseEntity removeFile(String member_id, String dir, String file) {
-        File rm_file = new File(rootPath +member_id+ dir + file);
+    public ResponseEntity removeFile(String member_id, String file) {
+        File rm_file = new File(rootPath +member_id+ file);
         String response = new String();
         if (rm_file.exists() && rm_file.isFile()) {
             rm_file.delete();
@@ -375,9 +375,9 @@ public class FileService {
     }
 
     //텍스트 읽어오기
-    public ResponseEntity readFile(Long member_id,String dir, String filename){
+    public ResponseEntity readFile(Long member_id,String filename){
         try {
-            File file = new File(rootPath + member_id + dir +filename);
+            File file = new File(rootPath + member_id + filename);
             String ext = FilenameUtils.getExtension(file.getPath());
 
             //예외처리
@@ -398,13 +398,13 @@ public class FileService {
         }
     }
     //이미지 읽어오기
-    public ResponseEntity readImage(String member_id, String dir, String image_name) {
-        String path =rootPath +member_id+ dir+ image_name;
+    public ResponseEntity readImage(String member_id, String imagepath) {
+        String path =rootPath + member_id + imagepath;
         String extend = FilenameUtils.getExtension(path);//이미지파일의 확장자
         //확장자 확인
-        if (extend.equals("png") && extend.equals("jpg")) {
+        if (extend.equals("png") || extend.equals("jpg")) {
             try {
-                InputStream imageStream = new FileInputStream(rootPath + dir + image_name);
+                InputStream imageStream = new FileInputStream(path);
                 byte[] imageByteArray = imageStream.readAllBytes();
                 imageStream.close();
                 return new ResponseEntity<>(imageByteArray, HttpStatus.OK);
