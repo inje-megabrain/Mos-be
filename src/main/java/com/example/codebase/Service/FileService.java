@@ -313,15 +313,6 @@ public class FileService {
     //파일업로드드
     public ResponseEntity uploadFile(String member_id, String dir, List<MultipartFile> files) {
         String response = new String();
-
-        if (!file.isEmpty()) {
-            try {
-                file.transferTo(new File(rootPath +dir+ file.getOriginalFilename()));
-                response = file.getOriginalFilename();
-            } catch (IOException e) {
-                response = "파일 업로드 실패";
-                throw new RuntimeException(e);
-
         for(int i=0;i<files.size();i++){
             if (!files.get(i).isEmpty()) {
                 try {
@@ -333,7 +324,6 @@ public class FileService {
                 }
             } else {
                 response = "파일이 비어있음";
-
             }
         }
 
