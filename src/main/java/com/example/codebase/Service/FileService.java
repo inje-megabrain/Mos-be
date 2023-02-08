@@ -1,6 +1,7 @@
 package com.example.codebase.Service;
 
 import com.example.codebase.Response.BasicResponse;
+import com.example.codebase.Response.getDirectory;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.core.io.FileSystemResource;
@@ -16,14 +17,14 @@ import java.util.List;
 @Service
 public class FileService {
     //private String rootPath = "/mos_file/"; //root Path
-    //private String rootPath = "/Users/leeseonghyeon/Desktop/"; //root Path
-    private String rootPath = "C:/Users/mun/Desktop/파일저장테스트/"; //root Path
+    private String rootPath = "/Users/leeseonghyeon/Desktop"; //root Path
+    //private String rootPath = "C:/Users/mun/Desktop/파일저장테스트/"; //root Path
 
 
 
-    public ResponseEntity<BasicResponse> makeDir(Long member_id, String dir) {   //폴더 생성
+    public ResponseEntity<BasicResponse> makeDir(String member_id, String dir) {   //폴더 생성
 
-        File newFile = new File(rootPath + dir);
+        File newFile = new File(rootPath + member_id + dir);
         BasicResponse basicResponse = new BasicResponse();
 
         if (!newFile.exists()) {
@@ -189,31 +190,44 @@ public class FileService {
 
             BasicResponse basicResponse = new BasicResponse();
 
-            List<String> list = new ArrayList<>();
+            List<getDirectory> list = new ArrayList<getDirectory>();
+
 
             for (File file : fileList) {
+                getDirectory insert = new getDirectory();
                 if (file.exists()) {
 
                     String fileName = file.getName();
 
-                    list.add(fileName);
+                    if(file.isFile()) {
+                        String[] name = fileName.split(".");
+                        if(name.length!=0) {
+                            insert = getDirectory.builder()
+                                    .isDir(false)
+                                    .name(name[0])
+                                    .ext(name[1])
+                                    .build();
+                            list.add(insert);
+                        }
+                    }
+                    else if(file.isDirectory()){
+                        insert = getDirectory.builder()
+                                .isDir(true)
+                                .name(fileName)
+                                .ext("Directory")
+                                .build();
+                        list.add(insert);
+                        }
+                    }
                 }
-
-            }
 
             basicResponse = BasicResponse.builder()
                     .code(HttpStatus.OK.value())
                     .httpStatus(HttpStatus.OK)
                     .message("폴더 내부 구조 확인")
-                    .accessToken("")
-                    .refreshToken("")
                     .result(list)
-                    .count(1).build();
+                    .count(list.size()).build();
             return new ResponseEntity<>(basicResponse, basicResponse.getHttpStatus());
-
-
-
-
     }
 
     //디렉토리 삭제(하위폴더,파일 모두 삭제됨)

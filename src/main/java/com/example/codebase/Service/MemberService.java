@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Optional;
@@ -36,18 +37,14 @@ public class MemberService {
 
             memberRepository.save(member);
 
-
-
+            File file = new File("/");
             BasicResponse basicResponse = new BasicResponse();
 
                 basicResponse = BasicResponse.builder()
                         .code(HttpStatus.OK.value())
                         .httpStatus(HttpStatus.OK)
                         .message("회원가입 정상적으로 완료")
-                        .accessToken("")
-                        .refreshToken("")
-                        .result(null)
-                        .count(1).build();
+                        .build();
 
             return new ResponseEntity<>(basicResponse, basicResponse.getHttpStatus());
             }catch(Exception e){
@@ -57,7 +54,6 @@ public class MemberService {
     public ResponseEntity<BasicResponse> login(HttpServletResponse response, MemberDto memberDto) { //로그인 API
 
            //회원가입
-
             Member member = memberRepository.findBymId(memberDto.getId());
 
             HashMap<String, String> m = new HashMap<>();
@@ -70,16 +66,16 @@ public class MemberService {
 
             response.setHeader("accessToken", accessToken);
             response.setHeader("refreshToken", refreshToken);
+
             BasicResponse basicResponse = new BasicResponse();
 
-                basicResponse = BasicResponse.builder()
+            basicResponse = BasicResponse.builder()
                         .code(HttpStatus.OK.value())
                         .httpStatus(HttpStatus.OK)
-                        .message("로그인 성공")
+                        .message("로그인 성공 & 파일 생성")
                         .accessToken(accessToken)
                         .refreshToken(refreshToken)
-                        .result(null)
-                        .count(1).build();
+                        .build();
 
             return new ResponseEntity<>(basicResponse, basicResponse.getHttpStatus());
 
