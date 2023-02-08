@@ -1,5 +1,6 @@
 package com.example.codebase.Service;
 
+import com.example.codebase.Response.AttributesResponse;
 import com.example.codebase.Response.BasicResponse;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -13,14 +14,22 @@ import java.io.*;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
+
+import static org.aspectj.weaver.tools.cache.SimpleCacheFactory.path;
 
 @Service
 public class FileService {
     //private String rootPath = "/mos_file/"; //root Path
-    //private String rootPath = "/Users/leeseonghyeon/Desktop/"; //root Path
-    private String rootPath = "C:/Users/mun/Desktop/파일저장테스트/"; //root Path
+    private String rootPath = "/Users/leeseonghyeon/Desktop/"; //root Path
+   // private String rootPath = "C:/Users/mun/Desktop/파일저장테스트/"; //root Path
 
 
 
@@ -325,8 +334,7 @@ public class FileService {
         }
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-    public ResponseEntity copy(Long member_id, String dir, String copyDir) {
-
+     public ResponseEntity copy(Long member_id, String dir, String copyDir) {
         File from = new File(rootPath+dir);
         File cp_file = new File(rootPath+copyDir);//파일이름뽑아내기용
         File to = new File(rootPath+dir+"/"+cp_file.getName());
@@ -406,4 +414,38 @@ public class FileService {
     }
 
 
+    public ResponseEntity<AttributesResponse> getAttribute(Long member_id, String file) {
+        Path getFile = Paths.get(rootPath+file);
+        System.out.println(getFile);
+        AttributesResponse attributesResponse = new AttributesResponse();
+
+        try {
+
+            // 파일 속성 찾기
+            Map<String, Object> getResult
+                    = Files.readAttributes(getFile, "*");
+            System.out.println("!");
+            FileTime creationTime = (FileTime) getResult.get("creationTime");
+            FileTime lastAccessTime = (FileTime) getResult.get("lastAccessTime");
+            FileTime lastModifiedTime = (FileTime) getResult.get("lastModifiedTime");
+            System.out.println("2");
+            System.out.println(creationTime);
+
+
+            attributesResponse = AttributesResponse.builder()
+                    .code(HttpStatus.OK.value())
+                    .httpStatus(HttpStatus.OK)
+                    .message("상세정보 열람 생성")
+                    .size(attributesResponse.getSize())
+                    .lastModifiedTime(String.valueOf(lastModifiedTime))
+                    .lastAccessTime(String.valueOf(lastAccessTime))
+                    .creationTime(String.valueOf(creationTime))
+                    .build();
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(attributesResponse, attributesResponse.getHttpStatus());
+    }
 }
