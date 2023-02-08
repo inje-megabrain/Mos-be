@@ -142,4 +142,17 @@ public class FileController {
         String member_id = jwtProvider.getMemberIdFromToken(accessToken);
         return fileService.playVideo(Long.valueOf(member_id),dir,videoname);
     }
+<<<<<<< Updated upstream
+=======
+
+    @GetMapping("/file")
+    public ResponseEntity<?> readFile(HttpServletRequest request,
+                                      @RequestParam String dir,
+                                      @RequestParam String filename){
+        String accessToken = request.getHeader("accessToken");
+        String member_id = jwtProvider.getMemberIdFromToken(accessToken);
+        return fileService.readFile(Long.valueOf(member_id),dir,filename);
+    }
+
+>>>>>>> Stashed changes
 }

@@ -369,6 +369,29 @@ public class FileService {
         return new ResponseEntity<>("저장완료",HttpStatus.OK);
     }
 
+    //텍스트 읽어오기
+    public ResponseEntity readFile(Long member_id,String dir, String filename){
+        try {
+            File file = new File(rootPath + dir + "/" +filename);
+            String ext = FilenameUtils.getExtension(file.getPath());
+
+            //예외처리
+            if(!ext.equals("txt")) return new ResponseEntity<>("읽을 수 없는 파일입니다.",HttpStatus.OK);
+
+            FileReader fileReader = new FileReader(file);
+            int singleCh = 0;
+            String txt = "";
+            while((singleCh=fileReader.read())!=-1){
+                txt+=(char)singleCh;
+            }
+            fileReader.close();
+            return new ResponseEntity<>(txt,HttpStatus.OK);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
     //이미지 읽어오기
     public ResponseEntity readImage(Long member_id, String dir, String image_name) {
         String path = rootPath + dir + image_name;
