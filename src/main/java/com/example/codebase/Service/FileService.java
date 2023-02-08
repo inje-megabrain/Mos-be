@@ -271,6 +271,7 @@ public class FileService {
     public ResponseEntity readImage(Long member_id, String dir, String image_name) {
         String path = rootPath + dir + image_name;
         String extend = FilenameUtils.getExtension(path);//이미지파일의 확장자
+        //확장자 확인
         if (extend.equals("png") && extend.equals("jpg")) {
             try {
                 InputStream imageStream = new FileInputStream(rootPath + dir + "/" + image_name);
@@ -287,6 +288,7 @@ public class FileService {
     public ResponseEntity playVideo(Long member_id, String dir, String videoname) {
         File file = new File(rootPath+dir+"/"+videoname);
         String ext = file.getName().substring(file.getName().lastIndexOf(".")+1);
+        //비디오 확장자 확인
         if(ext.equals("mp4")||ext.equals("avi")||ext.equals("mov")) {
             Resource resource = new FileSystemResource(rootPath+dir+"/"+videoname);
             HttpHeaders headers = new HttpHeaders();
