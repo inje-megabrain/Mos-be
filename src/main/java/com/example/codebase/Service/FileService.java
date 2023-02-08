@@ -12,7 +12,7 @@ import java.util.List;
 
 @Service
 public class FileService {
-    private String rootPath = "/Users/leeseonghyeon/Desktop/Mega/"; //root Path
+    private String rootPath = "/mos_file/"; //root Path
 
     public ResponseEntity<BasicResponse> makeDir(Long member_id, String dir) {   //폴더 생성
 
