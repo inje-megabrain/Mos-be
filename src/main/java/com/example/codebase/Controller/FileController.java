@@ -7,6 +7,7 @@ import com.example.codebase.Service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -86,11 +87,12 @@ public class FileController {
   
     @PostMapping("/removeDir")
     public ResponseEntity<?> removeDir(HttpServletRequest request,
-                                                   @RequestParam("dir") String dir){
+                                       @RequestParam("dir") String dir,
+                                       @RequestParam("rm") String rm){
       
         String accessToken = request.getHeader("accessToken");
         String member_id = jwtProvider.getMemberIdFromToken(accessToken);
-        return fileService.removeDir(Long.valueOf(member_id),dir);
+        return fileService.removeDir(Long.valueOf(member_id),dir,rm);
     }
 
     @PostMapping("/copy")
@@ -101,10 +103,6 @@ public class FileController {
         String member_id = jwtProvider.getMemberIdFromToken(accessToken);
         return fileService.copy(Long.valueOf(member_id), dir, copyDir);
     }
-
-
-
-
 
     @PostMapping("/removeFile")
     public ResponseEntity<?> removeFile(HttpServletRequest request,

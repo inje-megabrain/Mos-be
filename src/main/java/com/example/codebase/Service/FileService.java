@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -223,8 +226,8 @@ public class FileService {
     }
 
     //디렉토리 삭제(하위폴더,파일 모두 삭제됨)
-    public ResponseEntity removeDir(Long member_id, String dir) {
-        File rm_dir = new File(rootPath + dir);
+    public ResponseEntity removeDir(Long member_id, String dir, String rm) {
+        File rm_dir = new File(rootPath + dir + "/" + rm);
         String response = new String();
         if (rm_dir.exists() && rm_dir.isDirectory()) {
             try {
@@ -331,84 +334,47 @@ public class FileService {
         }
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
-
-    public ResponseEntity<BasicResponse> copy(Long member_id, String dir, String copyDir) {
-        BasicResponse basicResponse = new BasicResponse();
-
-        char[] ch = copyDir.toCharArray();
-
-        int cnt=0;
-
-        for(int i=ch.length-1; i>=0; i--){
-            if(ch[i]=='/'){
-                cnt=i+1;
-                break;
-            }
-        }
-        char[] result= new char[ch.length-cnt];
-
-        for(int i=cnt; i<ch.length; i++) {
-            result[i-cnt]=ch[i];
-        }
-
-        String path = String.valueOf(result);
-
-        File from = new File(rootPath+dir+copyDir);
-        if(from.exists() && from.isFile()){
-            File file = new File(from+" 복사본");
-        }
-
-        File to = new File(rootPath+copyDir+"/"+path);
-        System.out.println(from);
-        System.out.println(to);
-
-        try {
-            if(from.equals(to) && from.isFile()) {
-                File file = new File(to+ "/ 복사본");
-                file.createNewFile();
-            }
-            else if(from.isDirectory() ){
-                if(from.exists()) {
-                    File[] fileList = from.listFiles();
-                    int cnt2=0;
-                    for (File file : fileList) {
-                        if (file==from) {
-                            cnt2++;
-                            String fileName = file.getName();
+     public ResponseEntity copy(Long member_id, String dir, String copyDir) {
+        File from = new File(rootPath+dir);
+        File cp_file = new File(rootPath+copyDir);//파일이름뽑아내기용
+        File to = new File(rootPath+dir+"/"+cp_file.getName());
+        File rt_file = new File(rootPath+dir+"/"+cp_file.getName());//파일반환용
+        if(rt_file.exists()) {
+            int i = 1;
+            while (true) {
+                rt_file = new File(to.getPath() + "복사본" + i);
+                if (!rt_file.exists()) {
+                    try {
+                        if (to.isFile()) {
+                            Files.copy(from.toPath(),rt_file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                            break;
+                        } else {
+                            rt_file.mkdir();
+                            FileUtils.copyDirectory(cp_file, rt_file);
+                            break;
                         }
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
                     }
-                    if(cnt==0)
-                        FileUtils.copyDirectory(to, new File(from + "/ 복사본"));
-                    FileUtils.copyDirectory(to, new File(from + "/ 복사본" + String.valueOf(cnt)));
-
                 }
-                FileUtils.copyDirectory(to, from);
+                i++;
             }
-            basicResponse = BasicResponse.builder()
-                    .code(HttpStatus.OK.value())
-                    .httpStatus(HttpStatus.OK)
-                    .message("파일 이동 완료")
-                    .accessToken("")
-                    .refreshToken("")
-                    .result(null)
-                    .count(1).build();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            basicResponse = BasicResponse.builder()
-                    .code(HttpStatus.BAD_REQUEST.value())
-                    .httpStatus(HttpStatus.BAD_REQUEST)
-                    .message("파일 이동 실패")
-                    .accessToken("")
-                    .refreshToken("")
-                    .result(null).count(1).build();
         }
+        else{
+            try{
+                if(to.isFile()){
+                    Files.copy(from.toPath(),to.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                }
+                else {
+                    rt_file.mkdir();
+                    FileUtils.copyDirectory(cp_file, rt_file);
+                }
+            } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+            }
 
-
-        return new ResponseEntity<>(basicResponse, basicResponse.getHttpStatus());
-
-
-
+        return new ResponseEntity<>("저장완료",HttpStatus.OK);
     }
 
     //이미지 읽어오기
