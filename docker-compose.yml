@@ -8,6 +8,6 @@ services:
     volumes:
       - /home/mega/mos_data:/mos_file
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://203.241.228.50:23306/tomorrow?useSSL=false&useUnicode=true&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_URL: jdbc:mysql://203.241.228.50:33306/tomorrow?useSSL=false&useUnicode=true&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: mega123
