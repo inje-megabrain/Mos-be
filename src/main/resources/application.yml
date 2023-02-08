@@ -3,9 +3,12 @@ spring:
     default-property-inclusion: non_null
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/tomorrow?serverTimezone=UTC&characterEncoding=UTF-8
+    url: jdbc:mysql://203.241.228.50:13307/tomorrow?serverTimezone=UTC&characterEncoding=UTF-8
+    #url: jdbc:mysql://127.0.0.1:3306/tomorrow?serverTimezone=UTC&characterEncoding=UTF-8
     username: root
-    password: 21474836
+    #password: 21474836
+    password: mega123
+
   jpa:
     database: mysql
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
@@ -23,5 +26,5 @@ spring:
         enable_lazy_load_no_trans: true # LAZY ??? default? ??
 jwt:
   secret: VlwEyVBsYt9V712583TejMnVUypblYcfPQye08f7MGVA9XkHk
-server:
-  port: 8081
+#server:
+ # port: 8081
