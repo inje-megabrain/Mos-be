@@ -16,8 +16,8 @@ import java.util.List;
 @Service
 public class FileService {
     //private String rootPath = "/mos_file/"; //root Path
-    //private String rootPath = "/Users/leeseonghyeon/Desktop/"; //root Path
-    private String rootPath = "C:/Users/mun/Desktop/파일저장테스트/"; //root Path
+    private String rootPath = "/Users/leeseonghyeon/Desktop/"; //root Path
+   // private String rootPath = "C:/Users/mun/Desktop/파일저장테스트/"; //root Path
 
 
 
@@ -327,7 +327,7 @@ public class FileService {
     public ResponseEntity<BasicResponse> copy(Long member_id, String dir, String copyDir) {
         BasicResponse basicResponse = new BasicResponse();
 
-        char[] ch = dir.toCharArray();
+        char[] ch = copyDir.toCharArray();
 
         int cnt=0;
 
@@ -345,19 +345,36 @@ public class FileService {
 
         String path = String.valueOf(result);
 
-        File from = new File(rootPath+dir);
+        File from = new File(rootPath+dir+copyDir);
+        if(from.exists() && from.isFile()){
+            File file = new File(from+" 복사본");
+        }
+
         File to = new File(rootPath+copyDir+"/"+path);
         System.out.println(from);
         System.out.println(to);
-        try {
-            if(from.equals(to))
-                to.renameTo(new File(from.getPath() + "복사본"));
-            if(from.isFile()){
 
-                FileUtils.copyFile(from, to);
+        try {
+            if(from.equals(to) && from.isFile()) {
+                File file = new File(to+ "/ 복사본");
+                file.createNewFile();
             }
-            else {
-                FileUtils.copyDirectory(from, to);
+            else if(from.isDirectory() ){
+                if(from.exists()) {
+                    File[] fileList = from.listFiles();
+                    int cnt2=0;
+                    for (File file : fileList) {
+                        if (file==from) {
+                            cnt2++;
+                            String fileName = file.getName();
+                        }
+                    }
+                    if(cnt==0)
+                        FileUtils.copyDirectory(to, new File(from + "/ 복사본"));
+                    FileUtils.copyDirectory(to, new File(from + "/ 복사본" + String.valueOf(cnt)));
+
+                }
+                FileUtils.copyDirectory(to, from);
             }
             basicResponse = BasicResponse.builder()
                     .code(HttpStatus.OK.value())
