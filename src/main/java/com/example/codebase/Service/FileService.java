@@ -29,7 +29,8 @@ import java.util.Map;
 @Service
 public class FileService {
 
-    public static String rootPath = "/Users/leeseonghyeon/Desktop/Mega/"; //root Path
+    //public static String rootPath = "/Users/leeseonghyeon/Desktop/Mega/"; //root Path
+    public static String rootPath = "/mos_data/"; //root Path
 
 
 
@@ -160,7 +161,7 @@ public class FileService {
     }
 
     public ResponseEntity<BasicResponse> getDir(String member_id, String dir) {    //폴더 구조 가져오기
-            File newDir = new File(rootPath + dir);
+            File newDir = new File(rootPath + member_id+ dir);
 
             File[] fileList = newDir.listFiles();
 
@@ -299,7 +300,7 @@ public class FileService {
     }
 
     public ResponseEntity removeFile(String member_id, String dir, String file) {
-        File rm_file = new File(rootPath +member_id+"/"+ dir+ "/" + file);
+        File rm_file = new File(rootPath +member_id+ dir + file);
         String response = new String();
         if (rm_file.exists() && rm_file.isFile()) {
             rm_file.delete();
@@ -318,7 +319,7 @@ public class FileService {
         for(int i=0;i<files.size();i++){
             if (!files.get(i).isEmpty()) {
                 try {
-                    files.get(i).transferTo(new File(rootPath +member_id+"/"+ dir+"/" + files.get(i).getOriginalFilename()));
+                    files.get(i).transferTo(new File(rootPath +member_id+ dir+"/" + files.get(i).getOriginalFilename()));
                     response = files.get(i).getOriginalFilename();
                 } catch (IOException e) {
                     response = "파일 업로드 실패";
@@ -336,9 +337,9 @@ public class FileService {
     public ResponseEntity copy(Long member_id, String dir, String copyDir) {
 
         File from = new File(rootPath+member_id+dir);
-        File cp_file = new File(rootPath+copyDir);//파일이름뽑아내기용
-        File to = new File(rootPath+dir+"/"+cp_file.getName());
-        File rt_file = new File(rootPath+dir+"/"+cp_file.getName());//파일반환용
+        File cp_file = new File(rootPath+member_id+copyDir);//파일이름뽑아내기용
+        File to = new File(rootPath+member_id+dir+"/"+cp_file.getName());
+        File rt_file = new File(rootPath+member_id+dir+"/"+cp_file.getName());//파일반환용
         if(rt_file.exists()) {
             int i = 1;
             while (true) {
@@ -379,7 +380,7 @@ public class FileService {
     //텍스트 읽어오기
     public ResponseEntity readFile(Long member_id,String dir, String filename){
         try {
-            File file = new File(rootPath + member_id + dir + "/" +filename);
+            File file = new File(rootPath + member_id + dir +filename);
             String ext = FilenameUtils.getExtension(file.getPath());
 
             //예외처리
@@ -401,12 +402,12 @@ public class FileService {
     }
     //이미지 읽어오기
     public ResponseEntity readImage(String member_id, String dir, String image_name) {
-        String path =rootPath +member_id+"/"+ dir+ image_name;
+        String path =rootPath +member_id+ dir+ image_name;
         String extend = FilenameUtils.getExtension(path);//이미지파일의 확장자
         //확장자 확인
         if (extend.equals("png") && extend.equals("jpg")) {
             try {
-                InputStream imageStream = new FileInputStream(rootPath + dir + "/" + image_name);
+                InputStream imageStream = new FileInputStream(rootPath + dir + image_name);
                 byte[] imageByteArray = imageStream.readAllBytes();
                 imageStream.close();
                 return new ResponseEntity<>(imageByteArray, HttpStatus.OK);
@@ -418,11 +419,11 @@ public class FileService {
 
     //비디오 재생
     public ResponseEntity playVideo(String member_id, String dir, String videoname) {
-        File file = new File(rootPath +member_id+"/"+ dir+"/"+videoname);
+        File file = new File(rootPath +member_id+ dir+videoname);
         String ext = file.getName().substring(file.getName().lastIndexOf(".")+1);
         //비디오 확장자 확인
         if(ext.equals("mp4")||ext.equals("avi")||ext.equals("mov")) {
-            Resource resource = new FileSystemResource(rootPath+dir+"/"+videoname);
+            Resource resource = new FileSystemResource(rootPath+member_id+dir+videoname);
             HttpHeaders headers = new HttpHeaders();
 
             headers.set(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s",videoname));
