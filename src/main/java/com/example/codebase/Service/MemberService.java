@@ -16,10 +16,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Optional;
 
+import static com.example.codebase.Service.FileService.rootPath;
+
 @Service
 public class MemberService {
     @Autowired
     JwtProvider jwtProvider;
+
     private final MemberRepository memberRepository;
 
     public MemberService(MemberRepository memberRepository) {
@@ -27,17 +30,22 @@ public class MemberService {
     }
 
     public ResponseEntity<BasicResponse> join(HttpServletResponse response, MemberDto memberDto) throws Exception {
+
         //회원가입
         try {
-            Member member = new Member();
-            member.setId(memberDto.getId());
-            member.setPw(memberDto.getPw());
+            Member result = new Member();
+            Member member = memberRepository.findBymId(memberDto.getId());
+            result.setId(memberDto.getId());
+            result.setPw(memberDto.getPw());
 
+
+            File file = new File(rootPath+memberDto.getId());
+            file.mkdir();
             member.setRoles(Collections.singletonList("USER")); //권한 설정
 
-            memberRepository.save(member);
+            memberRepository.save(result);
 
-            File file = new File("/");
+
             BasicResponse basicResponse = new BasicResponse();
 
                 basicResponse = BasicResponse.builder()
@@ -55,29 +63,35 @@ public class MemberService {
 
            //회원가입
             Member member = memberRepository.findBymId(memberDto.getId());
-
-            HashMap<String, String> m = new HashMap<>();
-
-            m.put("member_id", String.valueOf(member.getMember_id()));
-            String accessToken, refreshToken;
-
-            accessToken = jwtProvider.generateToken(m);
-            refreshToken = jwtProvider.generateRefreshToken(m);
-
-            response.setHeader("accessToken", accessToken);
-            response.setHeader("refreshToken", refreshToken);
-
             BasicResponse basicResponse = new BasicResponse();
 
-            basicResponse = BasicResponse.builder()
+            if(member==null || !member.getPw().equals(memberDto.getPw()))
+                basicResponse = BasicResponse.builder()
+                        .code(HttpStatus.BAD_REQUEST.value())
+                        .httpStatus(HttpStatus.BAD_REQUEST)
+                        .message("로그인 실패")
+                        .build();
+            else {
+                HashMap<String, String> m = new HashMap<>();
+
+                m.put("id", memberDto.getId());
+                String accessToken, refreshToken;
+
+                accessToken = jwtProvider.generateToken(m);
+                refreshToken = jwtProvider.generateRefreshToken(m);
+
+                response.setHeader("accessToken", accessToken);
+                response.setHeader("refreshToken", refreshToken);
+
+
+                basicResponse = BasicResponse.builder()
                         .code(HttpStatus.OK.value())
                         .httpStatus(HttpStatus.OK)
                         .message("로그인 성공 & 파일 생성")
                         .accessToken(accessToken)
                         .refreshToken(refreshToken)
                         .build();
-
+            }
             return new ResponseEntity<>(basicResponse, basicResponse.getHttpStatus());
-
     }
 }

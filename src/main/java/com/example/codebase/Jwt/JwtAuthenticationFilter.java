@@ -94,7 +94,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         else if(accessToken!=null && !jwtProvider.isTokenExpired(accessToken)){
             System.out.println("accessToken이 유요합니다");
-            String memberId = jwtProvider.getMemberIdFromToken(accessToken);
+            String memberId = jwtProvider.getIdFromToken(accessToken);
             System.out.println(memberId);
             try {
                 authenticate = jwtProvider

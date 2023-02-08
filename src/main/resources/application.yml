@@ -3,11 +3,11 @@ spring:
     default-property-inclusion: non_null
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    #url: jdbc:mysql://203.241.228.50:33306/tomorrow?serverTimezone=UTC&characterEncoding=UTF-8
-    url: jdbc:mysql://127.0.0.1:3306/testdb?serverTimezone=UTC&characterEncoding=UTF-8
+    url: jdbc:mysql://203.241.228.50:33306/tomorrow?serverTimezone=UTC&characterEncoding=UTF-8
+    #url: jdbc:mysql://127.0.0.1:3306/testdb?serverTimezone=UTC&characterEncoding=UTF-8
     username: root
-    password: 21474836
-    #password: mega123
+    #password: 21474836
+    password: mega123
     #password: admin
 
   jpa:

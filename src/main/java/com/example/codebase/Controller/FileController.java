@@ -29,21 +29,11 @@ public class FileController {
 
     @PostMapping("/makeDir") //---> 폴더만 생성하는 API
     public ResponseEntity<BasicResponse> makeDir(HttpServletRequest request,
-                                                 @RequestParam("dir") String dir){
+                                                 @RequestParam("dir") String dir) throws IOException {
         String accessToken = request.getHeader("accessToken");
-        String member_id = jwtProvider.getMemberIdFromToken(accessToken);
+        String id = jwtProvider.getIdFromToken(accessToken);
 
-        return fileService.makeDir(member_id,dir);
-    }
-
-    @PostMapping("/makeFile") //---> 파일 생성하는 API
-    public ResponseEntity<BasicResponse> makeDir(HttpServletRequest request,
-                                                 @RequestParam("dir") String dir,
-                                                 @RequestParam("file") String file) throws IOException {
-        String accessToken = request.getHeader("accessToken");
-        String member_id = jwtProvider.getMemberIdFromToken(accessToken);
-
-        return fileService.makeFile(Long.valueOf(member_id), dir, file);  //-->directory 객체 전달
+        return fileService.makeDir(id,dir);
     }
 
     @PostMapping("/renameFile")
@@ -51,9 +41,9 @@ public class FileController {
                                                     @RequestParam("dir") String dir,
                                                     @RequestParam("file") String file, @RequestParam("rename") String rename){
         String accessToken = request.getHeader("accessToken");
-        String member_id = jwtProvider.getMemberIdFromToken(accessToken);
+        String member_id = jwtProvider.getIdFromToken(accessToken);
 
-        return fileService.renameFile(Long.valueOf(member_id), dir, file, rename);
+        return fileService.renameFile(member_id, dir, file, rename);
     }
 
     @PostMapping("/renameDir")
@@ -61,18 +51,18 @@ public class FileController {
                                                    @RequestParam("dir") String dir,
                                                    @RequestParam("rename") String rename){
         String accessToken = request.getHeader("accessToken");
-        String member_id = jwtProvider.getMemberIdFromToken(accessToken);
+        String member_id = jwtProvider.getIdFromToken(accessToken);
 
-        return fileService.renameDir(Long.valueOf(member_id), dir, rename);
+        return fileService.renameDir(member_id, dir, rename);
     }
 
     @GetMapping("/getDir")
     public ResponseEntity<?> getDir(HttpServletRequest request,
                                                 @RequestParam("dir") String dir){
         String accessToken = request.getHeader("accessToken");
-        String member_id = jwtProvider.getMemberIdFromToken(accessToken);
+        String member_id = jwtProvider.getIdFromToken(accessToken);
 
-        return fileService.getDir(Long.valueOf(member_id), dir);
+        return fileService.getDir(member_id, dir);
     }
 
 
@@ -81,8 +71,8 @@ public class FileController {
                                                 @RequestParam("dir") String dir,
                                                 @RequestParam("mv_dir") String mv_dir) throws IOException {
         String accessToken = request.getHeader("accessToken");
-        String member_id = jwtProvider.getMemberIdFromToken(accessToken);
-        return fileService.moveDir(Long.valueOf(member_id), dir, mv_dir);
+        String member_id = jwtProvider.getIdFromToken(accessToken);
+        return fileService.moveDir(member_id, dir, mv_dir);
     }
   
     @PostMapping("/removeDir")
@@ -91,8 +81,8 @@ public class FileController {
                                        @RequestParam("rm") String rm){
       
         String accessToken = request.getHeader("accessToken");
-        String member_id = jwtProvider.getMemberIdFromToken(accessToken);
-        return fileService.removeDir(Long.valueOf(member_id),dir,rm);
+        String member_id = jwtProvider.getIdFromToken(accessToken);
+        return fileService.removeDir(member_id,dir,rm);
     }
 
     @PostMapping("/copy")
@@ -100,8 +90,8 @@ public class FileController {
                                               @RequestParam("dir") String dir,
                                               @RequestParam("copyDir") String copyDir) throws IOException {
         String accessToken = request.getHeader("accessToken");
-        String member_id = jwtProvider.getMemberIdFromToken(accessToken);
-        return fileService.copy(Long.valueOf(member_id), dir, copyDir);
+        String member_id = jwtProvider.getIdFromToken(accessToken);
+        return fileService.copy(member_id, dir, copyDir);
     }
 
     @PostMapping("/removeFile")
@@ -109,8 +99,8 @@ public class FileController {
                                        @RequestParam("dir") String dir,
                                        @RequestParam("file") String file){
         String accessToken = request.getHeader("accessToken");
-        String member_id = jwtProvider.getMemberIdFromToken(accessToken);
-        return fileService.removeFile(Long.valueOf(member_id),dir,file);
+        String member_id = jwtProvider.getIdFromToken(accessToken);
+        return fileService.removeFile(member_id,dir,file);
     }
 
     @PostMapping("/upload")
@@ -118,8 +108,8 @@ public class FileController {
                                         @RequestParam("dir") String dir,
                                         @RequestParam("file")MultipartFile file){
         String accessToken = request.getHeader("accessToken");
-        String member_id = jwtProvider.getMemberIdFromToken(accessToken);
-        return fileService.uploadFile(Long.valueOf(member_id),dir,file);
+        String member_id = jwtProvider.getIdFromToken(accessToken);
+        return fileService.uploadFile(member_id,dir,file);
     }
 
     @GetMapping("/image")
@@ -127,8 +117,8 @@ public class FileController {
                                        @RequestParam String dir,
                                        @RequestParam String imagename){
         String accessToken = request.getHeader("accessToken");
-        String member_id = jwtProvider.getMemberIdFromToken(accessToken);
-        return fileService.readImage(Long.valueOf(member_id),dir,imagename);
+        String member_id = jwtProvider.getIdFromToken(accessToken);
+        return fileService.readImage(member_id,dir,imagename);
     }
 
     @GetMapping("/video")
@@ -137,8 +127,8 @@ public class FileController {
                                               @RequestParam String videoname){
 
         String accessToken = request.getHeader("accessToken");
-        String member_id = jwtProvider.getMemberIdFromToken(accessToken);
-        return fileService.playVideo(Long.valueOf(member_id),dir,videoname);
+        String member_id = jwtProvider.getIdFromToken(accessToken);
+        return fileService.playVideo(member_id,dir,videoname);
     }
 
     /*@GetMapping("/getAttribute")
