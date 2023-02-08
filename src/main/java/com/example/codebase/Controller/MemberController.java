@@ -25,13 +25,13 @@ public class MemberController {
     }
 
     @PostMapping("/login") //로그인 API
-    public ResponseEntity<BasicResponse> login(HttpServletRequest req,
+    public ResponseEntity<BasicResponse> login(HttpServletResponse response,
                                                @RequestBody MemberDto memberDto) {
 
-        String accessToken = req.getHeader("accessToken");
-        String member_id = jwtProvider.getMemberIdFromToken(accessToken);
-        return memberService.login((Long.valueOf(member_id)), memberDto);
+
+        return memberService.login(response, memberDto);
     }
+
 
 
 }

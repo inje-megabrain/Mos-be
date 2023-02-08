@@ -1,14 +1,13 @@
 package com.example.codebase.Controller;
 
 import com.example.codebase.Jwt.JwtProvider;
+import com.example.codebase.Response.AttributesResponse;
 import com.example.codebase.Response.BasicResponse;
 import com.example.codebase.Service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.ResourceRegion;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
+
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.FileInputStream;
+
 import java.io.IOException;
 
 @RestController
@@ -88,11 +87,12 @@ public class FileController {
   
     @PostMapping("/removeDir")
     public ResponseEntity<?> removeDir(HttpServletRequest request,
-                                                   @RequestParam("dir") String dir){
+                                       @RequestParam("dir") String dir,
+                                       @RequestParam("rm") String rm){
       
         String accessToken = request.getHeader("accessToken");
         String member_id = jwtProvider.getMemberIdFromToken(accessToken);
-        return fileService.removeDir(Long.valueOf(member_id),dir);
+        return fileService.removeDir(Long.valueOf(member_id),dir,rm);
     }
 
     @PostMapping("/copy")
@@ -103,10 +103,6 @@ public class FileController {
         String member_id = jwtProvider.getMemberIdFromToken(accessToken);
         return fileService.copy(Long.valueOf(member_id), dir, copyDir);
     }
-
-
-
-
 
     @PostMapping("/removeFile")
     public ResponseEntity<?> removeFile(HttpServletRequest request,
@@ -144,4 +140,13 @@ public class FileController {
         String member_id = jwtProvider.getMemberIdFromToken(accessToken);
         return fileService.playVideo(Long.valueOf(member_id),dir,videoname);
     }
+
+    @GetMapping("/getAttribute")
+    public ResponseEntity<AttributesResponse> getAttribute(HttpServletRequest request,
+                                                           @RequestParam("file") String file) throws IOException {
+        String accessToken = request.getHeader("accessToken");
+        String member_id = jwtProvider.getMemberIdFromToken(accessToken);
+        return fileService.getAttribute(Long.valueOf(member_id), file);
+    }
+
 }

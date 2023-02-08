@@ -1,5 +1,6 @@
 package com.example.codebase.Service;
 
+import com.example.codebase.Response.AttributesResponse;
 import com.example.codebase.Response.BasicResponse;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -10,14 +11,25 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
+
+import static org.aspectj.weaver.tools.cache.SimpleCacheFactory.path;
 
 @Service
 public class FileService {
     //private String rootPath = "/mos_file/"; //root Path
-    //private String rootPath = "/Users/leeseonghyeon/Desktop/"; //root Path
-    private String rootPath = "C:/Users/mun/Desktop/파일저장테스트/"; //root Path
+    private String rootPath = "/Users/leeseonghyeon/Desktop/"; //root Path
+   // private String rootPath = "C:/Users/mun/Desktop/파일저장테스트/"; //root Path
 
 
 
@@ -220,8 +232,8 @@ public class FileService {
     }
 
     //디렉토리 삭제(하위폴더,파일 모두 삭제됨)
-    public ResponseEntity removeDir(Long member_id, String dir) {
-        File rm_dir = new File(rootPath + dir);
+    public ResponseEntity removeDir(Long member_id, String dir, String rm) {
+        File rm_dir = new File(rootPath + dir + "/" + rm);
         String response = new String();
         if (rm_dir.exists() && rm_dir.isDirectory()) {
             try {
@@ -328,67 +340,47 @@ public class FileService {
         }
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
-
-    public ResponseEntity<BasicResponse> copy(Long member_id, String dir, String copyDir) {
-        BasicResponse basicResponse = new BasicResponse();
-
-        char[] ch = dir.toCharArray();
-
-        int cnt=0;
-
-        for(int i=ch.length-1; i>=0; i--){
-            if(ch[i]=='/'){
-                cnt=i+1;
-                break;
-            }
-        }
-        char[] result= new char[ch.length-cnt];
-
-        for(int i=cnt; i<ch.length; i++) {
-            result[i-cnt]=ch[i];
-        }
-
-        String path = String.valueOf(result);
-
+     public ResponseEntity copy(Long member_id, String dir, String copyDir) {
         File from = new File(rootPath+dir);
-        File to = new File(rootPath+copyDir+"/"+path);
-        System.out.println(from);
-        System.out.println(to);
-        try {
-            if(from.equals(to))
-                to.renameTo(new File(from.getPath() + "복사본"));
-            if(from.isFile()){
-
-                FileUtils.copyFile(from, to);
+        File cp_file = new File(rootPath+copyDir);//파일이름뽑아내기용
+        File to = new File(rootPath+dir+"/"+cp_file.getName());
+        File rt_file = new File(rootPath+dir+"/"+cp_file.getName());//파일반환용
+        if(rt_file.exists()) {
+            int i = 1;
+            while (true) {
+                rt_file = new File(to.getPath() + "복사본" + i);
+                if (!rt_file.exists()) {
+                    try {
+                        if (to.isFile()) {
+                            Files.copy(from.toPath(),rt_file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                            break;
+                        } else {
+                            rt_file.mkdir();
+                            FileUtils.copyDirectory(cp_file, rt_file);
+                            break;
+                        }
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                i++;
             }
-            else {
-                FileUtils.copyDirectory(from, to);
-            }
-            basicResponse = BasicResponse.builder()
-                    .code(HttpStatus.OK.value())
-                    .httpStatus(HttpStatus.OK)
-                    .message("파일 이동 완료")
-                    .accessToken("")
-                    .refreshToken("")
-                    .result(null)
-                    .count(1).build();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            basicResponse = BasicResponse.builder()
-                    .code(HttpStatus.BAD_REQUEST.value())
-                    .httpStatus(HttpStatus.BAD_REQUEST)
-                    .message("파일 이동 실패")
-                    .accessToken("")
-                    .refreshToken("")
-                    .result(null).count(1).build();
         }
+        else{
+            try{
+                if(to.isFile()){
+                    Files.copy(from.toPath(),to.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                }
+                else {
+                    rt_file.mkdir();
+                    FileUtils.copyDirectory(cp_file, rt_file);
+                }
+            } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+            }
 
-
-        return new ResponseEntity<>(basicResponse, basicResponse.getHttpStatus());
-
-
-
+        return new ResponseEntity<>("저장완료",HttpStatus.OK);
     }
 
     //이미지 읽어오기
@@ -428,4 +420,38 @@ public class FileService {
     }
 
 
+    public ResponseEntity<AttributesResponse> getAttribute(Long member_id, String file) {
+        Path getFile = Paths.get(rootPath+file);
+        System.out.println(getFile);
+        AttributesResponse attributesResponse = new AttributesResponse();
+
+        try {
+
+            // 파일 속성 찾기
+            Map<String, Object> getResult
+                    = Files.readAttributes(getFile, "*");
+            System.out.println("!");
+            FileTime creationTime = (FileTime) getResult.get("creationTime");
+            FileTime lastAccessTime = (FileTime) getResult.get("lastAccessTime");
+            FileTime lastModifiedTime = (FileTime) getResult.get("lastModifiedTime");
+            System.out.println("2");
+            System.out.println(creationTime);
+
+
+            attributesResponse = AttributesResponse.builder()
+                    .code(HttpStatus.OK.value())
+                    .httpStatus(HttpStatus.OK)
+                    .message("상세정보 열람 생성")
+                    .size(attributesResponse.getSize())
+                    .lastModifiedTime(String.valueOf(lastModifiedTime))
+                    .lastAccessTime(String.valueOf(lastAccessTime))
+                    .creationTime(String.valueOf(creationTime))
+                    .build();
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(attributesResponse, attributesResponse.getHttpStatus());
+    }
 }
