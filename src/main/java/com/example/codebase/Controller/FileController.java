@@ -70,16 +70,16 @@ public class FileController {
         return fileService.getDir(Long.valueOf(member_id), dir);
     }
 
-    /*
+
     @PostMapping("/moveDir")
-    public void getDir(HttpServletRequest request,
-                       @RequestParam("dir") String dir,
-                       @RequestParam("mv_dir") String mv_dir) throws IOException {
+    public ResponseEntity<BasicResponse> getDir(HttpServletRequest request,
+                                                @RequestParam("dir") String dir,
+                                                @RequestParam("mv_dir") String mv_dir) throws IOException {
         String accessToken = request.getHeader("accessToken");
         String member_id = jwtProvider.getMemberIdFromToken(accessToken);
 
-        fileService.moveDir(Long.valueOf(member_id), dir, mv_dir);
+        return fileService.moveDir(Long.valueOf(member_id), dir, mv_dir);
     }
 
-     */
+
 }
