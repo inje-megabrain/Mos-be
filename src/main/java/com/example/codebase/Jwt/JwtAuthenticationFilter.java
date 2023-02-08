@@ -57,10 +57,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     //ID, PW가 존재하는 계정이면 Holder에 객체 저장
 
                     HashMap<String, String> m = new HashMap<>();
-                    m.put("memberId", memberId);    //RefreshToken에 저장된 Id를 가져온다
+                    m.put("member_id", memberId);    //RefreshToken에 저장된 Id를 가져온다
 
                     accessToken = jwtProvider.generateToken(m);   //accessToken 재발급
-                    res.setHeader("accessToken", accessToken);
+                    res.addHeader("accessToken", accessToken);
                     System.out.println("새로 생성 access");
 
                 } catch (Exception e) {
@@ -83,7 +83,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     //ID, PW가 존재하는 계정이면 Holder에 객체 저장
 
                     HashMap<String, String> m = new HashMap<>();
-                    m.put("memberId", memberId);    //RefreshToken에 저장된 Id를 가져온다
+                    m.put("member_id", memberId);    //RefreshToken에 저장된 Id를 가져온다
 
                     refreshToken= jwtProvider.generateRefreshToken(m);   //accessToken 재발급
                     res.setHeader("refreshToken", refreshToken);

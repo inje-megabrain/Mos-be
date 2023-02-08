@@ -27,7 +27,7 @@ public class MemberController {
         return memberService.join(response, id, pw);
     }
 
-    @PostMapping("login") //로그인 API
+    @PostMapping("/login") //로그인 API
     public ResponseEntity<BasicResponse> login(HttpServletRequest req,
                                                @RequestParam("id") String id,
                                                @RequestParam("pw") String pw) {

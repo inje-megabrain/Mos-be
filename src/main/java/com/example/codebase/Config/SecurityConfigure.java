@@ -26,7 +26,7 @@ public class SecurityConfigure {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {  //해당 URL은 필터 거치지 않겠다
-        return (web -> web.ignoring().antMatchers("/join"));
+        return (web -> web.ignoring().antMatchers("/**"));
         //return (web -> web.ignoring().antMatchers("/test"));
     }
 
@@ -42,7 +42,7 @@ public class SecurityConfigure {
                 .authorizeRequests()
                 .antMatchers("/test").permitAll()
                 .antMatchers("/login").hasAuthority("[USER]")
-
+                //.antMatchers("/**").hasAuthority("[USER]")
                 .and()
                 .addFilterBefore(jwtAuthenticationFilter(jwtProvider),
                         UsernamePasswordAuthenticationFilter.class)
