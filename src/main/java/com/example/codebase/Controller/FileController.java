@@ -1,13 +1,11 @@
 package com.example.codebase.Controller;
 
 import com.example.codebase.Jwt.JwtProvider;
+import com.example.codebase.Response.AttributesResponse;
 import com.example.codebase.Response.BasicResponse;
 import com.example.codebase.Service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.ResourceRegion;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.FileInputStream;
+
 import java.io.IOException;
 
 @RestController
@@ -69,7 +67,7 @@ public class FileController {
     }
 
     @GetMapping("/getDir")
-    public ResponseEntity<BasicResponse> getDir(HttpServletRequest request,
+    public ResponseEntity<?> getDir(HttpServletRequest request,
                                                 @RequestParam("dir") String dir){
         String accessToken = request.getHeader("accessToken");
         String member_id = jwtProvider.getMemberIdFromToken(accessToken);
@@ -142,6 +140,11 @@ public class FileController {
         String member_id = jwtProvider.getMemberIdFromToken(accessToken);
         return fileService.playVideo(Long.valueOf(member_id),dir,videoname);
     }
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 9c950808c6bd9398b7b5decdc986b9bbf21921ac
     @GetMapping("/file")
     public ResponseEntity<?> readFile(HttpServletRequest request,
                                       @RequestParam String dir,
@@ -151,4 +154,17 @@ public class FileController {
         return fileService.readFile(Long.valueOf(member_id),dir,filename);
     }
 
+<<<<<<< HEAD
+=======
+
+
+    @GetMapping("/getAttribute")
+    public ResponseEntity<AttributesResponse> getAttribute(HttpServletRequest request,
+                                                           @RequestParam("file") String file) throws IOException {
+        String accessToken = request.getHeader("accessToken");
+        String member_id = jwtProvider.getMemberIdFromToken(accessToken);
+        return fileService.getAttribute(Long.valueOf(member_id), file);
+    }
+
+>>>>>>> 9c950808c6bd9398b7b5decdc986b9bbf21921ac
 }
