@@ -183,34 +183,40 @@ public class FileService {
     }
 
     public ResponseEntity<BasicResponse> getDir(Long member_id, String dir) {    //폴더 구조 가져오기
-        File newDir = new File(rootPath + dir);
+        try{
+            File newDir = new File(rootPath + dir);
 
-        File[] fileList = newDir.listFiles();
+            File[] fileList = newDir.listFiles();
 
-        BasicResponse basicResponse = new BasicResponse();
+            BasicResponse basicResponse = new BasicResponse();
 
-        List<String> list = new ArrayList<>();
+            List<String> list = new ArrayList<>();
 
-        for (File file : fileList) {
-            if (file.exists()) {
+            for (File file : fileList) {
+                if (file.exists()) {
 
-                String fileName = file.getName();
+                    String fileName = file.getName();
 
-                list.add(fileName);
+                    list.add(fileName);
+                }
+
             }
 
+            basicResponse = BasicResponse.builder()
+                    .code(HttpStatus.OK.value())
+                    .httpStatus(HttpStatus.OK)
+                    .message("폴더 내부 구조 확인")
+                    .accessToken("")
+                    .refreshToken("")
+                    .result(list)
+                    .count(1).build();
+            return new ResponseEntity<>(basicResponse, basicResponse.getHttpStatus());
+        }catch (Exception e){
+            return new ResponseEntity<>("오류",HttpStatus.OK);
         }
 
-        basicResponse = BasicResponse.builder()
-                .code(HttpStatus.OK.value())
-                .httpStatus(HttpStatus.OK)
-                .message("폴더 내부 구조 확인")
-                .accessToken("")
-                .refreshToken("")
-                .result(list)
-                .count(1).build();
 
-        return new ResponseEntity<>(basicResponse, basicResponse.getHttpStatus());
+
     }
 
     //디렉토리 삭제(하위폴더,파일 모두 삭제됨)

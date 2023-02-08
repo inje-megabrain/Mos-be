@@ -68,7 +68,7 @@ public class FileController {
     }
 
     @GetMapping("/getDir")
-    public ResponseEntity<BasicResponse> getDir(HttpServletRequest request,
+    public ResponseEntity<?> getDir(HttpServletRequest request,
                                                 @RequestParam("dir") String dir){
         String accessToken = request.getHeader("accessToken");
         String member_id = jwtProvider.getMemberIdFromToken(accessToken);
