@@ -40,6 +40,7 @@ public class FileService {
         File newFile = new File(rootPath + member_id + dir);
         BasicResponse basicResponse = new BasicResponse();
 
+
         if (!newFile.exists()) {
             try {
                 newFile.mkdir();
@@ -131,12 +132,13 @@ public class FileService {
     }
 
     public ResponseEntity<BasicResponse> renameDir(String member_id, String dir, String rename) {  //폴더 이름 변경
-        File newDir = new File(rootPath +member_id+ dir);
+        File newDir = new File(rootPath+dir);
 
         BasicResponse basicResponse = new BasicResponse();
 
         File changeFile = new File(rootPath, rename); //변경할 이름
-
+        System.out.println(newDir);
+        System.out.println(changeFile);
         if (newDir.exists()) {    // 파일이 존재할 때만 이름 변경
             if (newDir.renameTo(changeFile))
                 basicResponse = BasicResponse.builder()
@@ -161,58 +163,52 @@ public class FileService {
     }
 
     public ResponseEntity<BasicResponse> getDir(String member_id, String dir) {    //폴더 구조 가져오기
-            File newDir = new File(rootPath + member_id+ dir);
 
-            File[] fileList = newDir.listFiles();
-
-            BasicResponse basicResponse = new BasicResponse();
-
-            List<getDirectory> list = new ArrayList<getDirectory>();
+        File newDir = new File(rootPath +member_id+ dir);
 
 
-            for (File file : fileList) {
-                getDirectory insert = new getDirectory();
-                if (file.exists()) {
-                    String fileName = file.getName();
+        File[] fileList = newDir.listFiles();
 
-                    if (file.isFile()) {
-                        int cnt=0;
-                        char []ch = fileName.toCharArray();
-                        for(int i= ch.length-1; i>=0; i--) {
-                            if(ch[i]=='.')
-                                cnt=i;
-                        }
+        BasicResponse basicResponse = new BasicResponse();
 
-                        char []ex = new char[ch.length-(cnt+1)];
-                        for(int i=cnt+1; i<ch.length; i++){
-                            ex[i-cnt-1]=ch[i];
-                        }
+        List<getDirectory> list = new ArrayList<getDirectory>();
 
+
+        for (File file : fileList) {
+            getDirectory insert = new getDirectory();
+            if (file.exists()) {
+
+                String fileName = file.getName();
+
+                if(file.isFile()) {
+                    String[] name = fileName.split(".");
+                    if(name.length!=0) {
                         insert = getDirectory.builder()
                                 .isDir(false)
-                                .name(fileName)
-                                .ext(String.valueOf(ex))
-                                .build();
-                        list.add(insert);
-                    } else if(file.isDirectory()){
-                        insert = getDirectory.builder()
-                                .isDir(true)
-                                .name(fileName)
-                                .ext("Directory")
+                                .name(name[0])
+                                .ext(name[1])
                                 .build();
                         list.add(insert);
                     }
                 }
+                else if(file.isDirectory()){
+                    insert = getDirectory.builder()
+                            .isDir(true)
+                            .name(fileName)
+                            .ext("Directory")
+                            .build();
+                    list.add(insert);
+                }
             }
+        }
 
-
-            basicResponse = BasicResponse.builder()
-                    .code(HttpStatus.OK.value())
-                    .httpStatus(HttpStatus.OK)
-                    .message("폴더 내부 구조 확인")
-                    .result(list)
-                    .count(list.size()).build();
-            return new ResponseEntity<>(basicResponse, basicResponse.getHttpStatus());
+        basicResponse = BasicResponse.builder()
+                .code(HttpStatus.OK.value())
+                .httpStatus(HttpStatus.OK)
+                .message("폴더 내부 구조 확인")
+                .result(list)
+                .count(list.size()).build();
+        return new ResponseEntity<>(basicResponse, basicResponse.getHttpStatus());
     }
 
     //디렉토리 삭제(하위폴더,파일 모두 삭제됨)
@@ -262,9 +258,10 @@ public class FileService {
 
         String path = String.valueOf(result);
 
-        File from = new File(rootPath +member_id+"/"+ dir);
-        File to = new File(rootPath +member_id+"/"+ dir+"/"+path);
-
+        File from = new File(rootPath +dir);
+        File to = new File(rootPath + dir+path);
+        System.out.println(from);
+        System.out.println(to);
             try {
                 if(from.isFile()){
                     System.out.println("!");
@@ -316,6 +313,15 @@ public class FileService {
     //파일업로드드
     public ResponseEntity uploadFile(String member_id, String dir, List<MultipartFile> files) {
         String response = new String();
+
+        if (!file.isEmpty()) {
+            try {
+                file.transferTo(new File(rootPath +dir+ file.getOriginalFilename()));
+                response = file.getOriginalFilename();
+            } catch (IOException e) {
+                response = "파일 업로드 실패";
+                throw new RuntimeException(e);
+
         for(int i=0;i<files.size();i++){
             if (!files.get(i).isEmpty()) {
                 try {
@@ -327,6 +333,7 @@ public class FileService {
                 }
             } else {
                 response = "파일이 비어있음";
+
             }
         }
 
