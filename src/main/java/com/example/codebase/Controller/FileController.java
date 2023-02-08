@@ -35,6 +35,15 @@ public class FileController {
 
         return fileService.makeDir(id,dir);
     }
+    @PostMapping("/makeFile") //---> 파일 생성하는 API
+    public ResponseEntity<BasicResponse> makeDir(HttpServletRequest request,
+                                                 @RequestParam("dir") String dir,
+                                                 @RequestParam("file") String file) throws IOException {
+        String accessToken = request.getHeader("accessToken");
+        String member_id = jwtProvider.getIdFromToken(accessToken);
+
+        return fileService.makeFile(member_id, dir, file);  //-->directory 객체 전달
+    }
 
     @PostMapping("/renameFile")
     public ResponseEntity<BasicResponse> renameFile(HttpServletRequest request,
