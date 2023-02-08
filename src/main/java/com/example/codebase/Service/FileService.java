@@ -5,6 +5,7 @@ import org.apache.commons.io.FileUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,7 +14,8 @@ import java.util.List;
 
 @Service
 public class FileService {
-    private String rootPath = "/mos_file/"; //root Path
+    //private String rootPath = "/mos_file/"; //root Path
+    private String rootPath = "C:/Users/mun/Desktop/파일저장테스트/";
     //private String rootPath = "/Users/leeseonghyeon/Desktop/Mega/";
 
     public ResponseEntity<BasicResponse> makeDir(Long member_id, String dir) {   //폴더 생성
@@ -211,4 +213,56 @@ public class FileService {
         return new ResponseEntity<>(basicResponse, basicResponse.getHttpStatus());
     }
 
+    public ResponseEntity removeDir(Long member_id, String dir) {
+        File rm_dir = new File(rootPath + dir);
+        String response = new String();
+        if(rm_dir.exists()&&rm_dir.isDirectory()){
+            try {
+                FileUtils.deleteDirectory(rm_dir);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            response = "폴더 삭제완료";
+        }
+        else if(rm_dir.exists()){
+            response = "폴더가 아닌 파일 이름";
+        }
+        else {
+            response = "존재하지 않는 폴더";
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    public ResponseEntity removeFile(Long member_id, String dir, String file) {
+        File rm_file = new File(rootPath + dir + file);
+        String response = new String();
+        if(rm_file.exists()&&rm_file.isFile()){
+            rm_file.delete();
+            response = "파일 삭제 완료";
+        }
+        else if(rm_file.exists()){
+            response = "폴더로 존재함";
+        }
+        else {
+            response = "존재하지 않는 파일";
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    public ResponseEntity uploadFile(Long member_id, String dir, MultipartFile file){
+        String response = new String();
+        if(!file.isEmpty()){
+            try {
+                file.transferTo(new File(rootPath+dir+file.getOriginalFilename()));
+                response = "파일 업로드 완료";
+            } catch (IOException e) {
+                response = "파일 업로드 실패";
+                throw new RuntimeException(e);
+            }
+        }
+        else{
+            response = "파일이 비어있음";
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -70,16 +71,29 @@ public class FileController {
         return fileService.getDir(Long.valueOf(member_id), dir);
     }
 
-    /*
-    @PostMapping("/moveDir")
-    public void getDir(HttpServletRequest request,
-                       @RequestParam("dir") String dir,
-                       @RequestParam("mv_dir") String mv_dir) throws IOException {
+    @PostMapping("/removeDir")
+    public ResponseEntity<?> removeDir(HttpServletRequest request,
+                                                   @RequestParam("dir") String dir){
         String accessToken = request.getHeader("accessToken");
         String member_id = jwtProvider.getMemberIdFromToken(accessToken);
-
-        fileService.moveDir(Long.valueOf(member_id), dir, mv_dir);
+        return fileService.removeDir(Long.valueOf(member_id),dir);
     }
 
-     */
+    @PostMapping("/removeFile")
+    public ResponseEntity<?> removeFile(HttpServletRequest request,
+                                       @RequestParam("dir") String dir,
+                                       @RequestParam("file") String file){
+        String accessToken = request.getHeader("accessToken");
+        String member_id = jwtProvider.getMemberIdFromToken(accessToken);
+        return fileService.removeFile(Long.valueOf(member_id),dir,file);
+    }
+
+    @PostMapping("/upload")
+    public ResponseEntity<?> uploadFile(HttpServletRequest request,
+                                        @RequestParam("dir") String dir,
+                                        @RequestParam("file") MultipartFile file){
+        String accessToken = request.getHeader("accessToken");
+        String member_id = jwtProvider.getMemberIdFromToken(accessToken);
+        return fileService.uploadFile(Long.valueOf(member_id),dir,file);
+    }
 }
