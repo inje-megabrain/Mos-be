@@ -294,19 +294,22 @@ public class FileService {
     }
 
     //파일업로드드
-    public ResponseEntity uploadFile(String member_id, String dir, MultipartFile file) {
+    public ResponseEntity uploadFile(String member_id, String dir, List<MultipartFile> files) {
         String response = new String();
-        if (!file.isEmpty()) {
-            try {
-                file.transferTo(new File(rootPath +member_id+"/"+ dir+"/" + file.getOriginalFilename()));
-                response = file.getOriginalFilename();
-            } catch (IOException e) {
-                response = "파일 업로드 실패";
-                throw new RuntimeException(e);
+        for(int i=0;i<files.size();i++){
+            if (!files.get(i).isEmpty()) {
+                try {
+                    files.get(i).transferTo(new File(rootPath +member_id+"/"+ dir+"/" + files.get(i).getOriginalFilename()));
+                    response = files.get(i).getOriginalFilename();
+                } catch (IOException e) {
+                    response = "파일 업로드 실패";
+                    throw new RuntimeException(e);
+                }
+            } else {
+                response = "파일이 비어있음";
             }
-        } else {
-            response = "파일이 비어있음";
         }
+
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
