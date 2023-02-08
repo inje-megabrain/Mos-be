@@ -163,9 +163,7 @@ public class FileService {
     }
 
     public ResponseEntity<BasicResponse> getDir(String member_id, String dir) {    //폴더 구조 가져오기
-
-        File newDir = new File(rootPath +member_id+ dir);
-
+        File newDir = new File(rootPath + member_id + dir);
 
         File[] fileList = newDir.listFiles();
 
@@ -173,28 +171,34 @@ public class FileService {
 
         List<getDirectory> list = new ArrayList<getDirectory>();
 
-
-        for (File file : fileList) {
-            getDirectory insert = new getDirectory();
-            if (file.exists()) {
-
-                String fileName = file.getName();
-
-                if(file.isFile()) {
-                    String[] name = fileName.split(".");
-                    if(name.length!=0) {
-                        insert = getDirectory.builder()
-                                .isDir(false)
-                                .name(name[0])
-                                .ext(name[1])
-                                .build();
-                        list.add(insert);
-                    }
-                }
-                else if(file.isDirectory()){
+        if (fileList != null) {
+            for (File file : fileList) {
+                getDirectory insert = new getDirectory();
+                if (file.getName().contains(".txt")) {
+                    insert = getDirectory.builder()
+                            .isDir(false)
+                            .name(file.getName())
+                            .ext("txt")
+                            .build();
+                    list.add(insert);
+                } else if (file.getName().contains(".png")) {
+                    insert = getDirectory.builder()
+                            .isDir(false)
+                            .name(file.getName())
+                            .ext("png")
+                            .build();
+                    list.add(insert);
+                } else if (file.getName().contains(".jpg")) {
+                    insert = getDirectory.builder()
+                            .isDir(false)
+                            .name(file.getName())
+                            .ext("jpg")
+                            .build();
+                    list.add(insert);
+                } else  {
                     insert = getDirectory.builder()
                             .isDir(true)
-                            .name(fileName)
+                            .name(file.getName())
                             .ext("Directory")
                             .build();
                     list.add(insert);
