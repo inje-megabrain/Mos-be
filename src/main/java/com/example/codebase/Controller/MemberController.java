@@ -21,6 +21,7 @@ public class MemberController {
     JwtProvider jwtProvider;
     @PostMapping("/join")   //회원가입 API
     public ResponseEntity<BasicResponse> join(HttpServletResponse response, @RequestBody MemberDto memberDto) throws Exception {
+
         return memberService.join(response, memberDto);
     }
 

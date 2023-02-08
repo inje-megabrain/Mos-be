@@ -25,7 +25,7 @@ public class UUIDController {
     public ResponseEntity<BasicResponse> makeUUID(HttpServletRequest request,
                                                   @RequestParam("path") String path) {
         String accessToken = request.getHeader("accessToken");
-        String member_id = jwtProvider.getMemberIdFromToken(accessToken);
+        String member_id = jwtProvider.getIdFromToken(accessToken);
 
         return uuidService.makeUUID(member_id, path);
     }

@@ -45,14 +45,14 @@ public class JwtProvider implements AuthenticationProvider {
         return token.getClaims();
     }
 
-    public String getMemberIdFromToken(String token) {
+    public String getIdFromToken(String token) {
         DecodedJWT verifiedToken = validateToken(token);
 
-        return verifiedToken.getClaim("member_id").asString();
+        return verifiedToken.getClaim("id").asString();
     }
     public String RefreshgetMemberIdFromToken(String token) {
         DecodedJWT verifiedToken = RefreshvalidateToken(token);
-        return verifiedToken.getClaim("member_id").asString();
+        return verifiedToken.getClaim("id").asString();
     }
 
     private JWTVerifier getTokenValidator() {
