@@ -19,5 +19,5 @@ public class BasicResponse {
     private String accessToken;
     private String refreshToken;
     private Integer count;
-    private List<Object> result;
+    private List<String> result;
 }
