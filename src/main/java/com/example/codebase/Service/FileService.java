@@ -16,8 +16,8 @@ import java.util.List;
 @Service
 public class FileService {
     //private String rootPath = "/mos_file/"; //root Path
-
-    private String rootPath = "/Users/leeseonghyeon/Desktop/"; //root Path
+    //private String rootPath = "/Users/leeseonghyeon/Desktop/"; //root Path
+    private String rootPath = "C:/Users/mun/Desktop/파일저장테스트/"; //root Path
 
 
 
