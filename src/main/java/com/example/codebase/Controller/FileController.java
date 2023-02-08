@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 public class FileController {
@@ -114,10 +115,10 @@ public class FileController {
     @PostMapping("/upload")
     public ResponseEntity<?> uploadFile(HttpServletRequest request,
                                         @RequestParam("dir") String dir,
-                                        @RequestParam("file")MultipartFile file){
+                                        @RequestParam("file") List<MultipartFile> files){
         String accessToken = request.getHeader("accessToken");
         String member_id = jwtProvider.getIdFromToken(accessToken);
-        return fileService.uploadFile(member_id,dir,file);
+        return fileService.uploadFile(member_id,dir,files);
     }
 
     @GetMapping("/image")
