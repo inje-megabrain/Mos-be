@@ -1,5 +1,6 @@
 package com.example.codebase.Service;
 
+import com.example.codebase.Response.AttributesResponse;
 import com.example.codebase.Response.BasicResponse;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -10,8 +11,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class FileService {
@@ -424,5 +430,38 @@ public class FileService {
         }
     }
 
+    public ResponseEntity<AttributesResponse> getAttribute(Long member_id, String file) {
+        Path getFile = Paths.get(rootPath+file);
+        System.out.println(getFile);
+        AttributesResponse attributesResponse = new AttributesResponse();
 
+        try {
+
+            // 파일 속성 찾기
+            Map<String, Object> getResult
+                    = Files.readAttributes(getFile, "*");
+            System.out.println("!");
+            FileTime creationTime = (FileTime) getResult.get("creationTime");
+            FileTime lastAccessTime = (FileTime) getResult.get("lastAccessTime");
+            FileTime lastModifiedTime = (FileTime) getResult.get("lastModifiedTime");
+            System.out.println("2");
+            System.out.println(creationTime);
+
+
+            attributesResponse = AttributesResponse.builder()
+                    .code(HttpStatus.OK.value())
+                    .httpStatus(HttpStatus.OK)
+                    .message("상세정보 열람 생성")
+                    .size(attributesResponse.getSize())
+                    .lastModifiedTime(String.valueOf(lastModifiedTime))
+                    .lastAccessTime(String.valueOf(lastAccessTime))
+                    .creationTime(String.valueOf(creationTime))
+                    .build();
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(attributesResponse, attributesResponse.getHttpStatus());
+    }
 }
