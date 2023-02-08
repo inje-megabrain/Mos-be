@@ -4,10 +4,10 @@ services:
     image: mos:1.0
     restart: always
     ports:
-      - 18100:8080
+      - 18200:8080
     volumes:
       - /home/mega/mos_data:/mos_file
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://203.241.228.50:13307/tomorrow?useSSL=false&useUnicode=true&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_URL: jdbc:mysql://203.241.228.50:23306/tomorrow?useSSL=false&useUnicode=true&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: mega123
