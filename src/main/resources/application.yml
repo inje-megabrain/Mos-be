@@ -27,5 +27,4 @@ spring:
         enable_lazy_load_no_trans: true # LAZY ??? default? ??
 jwt:
   secret: VlwEyVBsYt9V712583TejMnVUypblYcfPQye08f7MGVA9XkHk
-#server:
- # port: 8081
+
