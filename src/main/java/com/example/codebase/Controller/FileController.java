@@ -91,7 +91,7 @@ public class FileController {
                                               @RequestParam("copyDir") String copyDir) throws IOException {
         String accessToken = request.getHeader("accessToken");
         String member_id = jwtProvider.getIdFromToken(accessToken);
-        return fileService.copy(member_id, dir, copyDir);
+        return fileService.copy(Long.valueOf(member_id), dir, copyDir);
     }
 
     @PostMapping("/removeFile")
