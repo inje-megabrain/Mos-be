@@ -1,5 +1,6 @@
 package com.example.codebase.Service;
 
+import com.example.codebase.Response.AttributesResponse;
 import com.example.codebase.Response.BasicResponse;
 import com.example.codebase.Response.getDirectory;
 import org.apache.commons.io.FileUtils;
@@ -11,14 +12,25 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.FileTime;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class FileService {
+
     public static String rootPath = "/mos_file/"; //root Path
-    //private String rootPath = "/Users/leeseonghyeon/Desktop"; //root Path
-    //private String rootPath = "C:/Users/mun/Desktop/파일저장테스트/"; //root Path
+
 
 
 
@@ -184,12 +196,17 @@ public class FileService {
     }
 
     //디렉토리 삭제(하위폴더,파일 모두 삭제됨)
+
     public ResponseEntity removeDir(String member_id, String dir, String rm) {
         File rm_dir = new File(rootPath +member_id+"/"+ dir);
         String response = new String();
+
         if (rm_dir.exists() && rm_dir.isDirectory()) {
             try {
-                FileUtils.deleteDirectory(rm_dir);
+                Files.walk(rm_dir.toPath())
+                        .sorted(Comparator.reverseOrder())
+                        .map(Path::toFile)
+                        .forEach(File::delete);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -355,6 +372,29 @@ public class FileService {
 
     }
 
+    //텍스트 읽어오기
+    public ResponseEntity readFile(Long member_id,String dir, String filename){
+        try {
+            File file = new File(rootPath + dir + "/" +filename);
+            String ext = FilenameUtils.getExtension(file.getPath());
+
+            //예외처리
+            if(!ext.equals("txt")) return new ResponseEntity<>("읽을 수 없는 파일입니다.",HttpStatus.OK);
+
+            FileReader fileReader = new FileReader(file);
+            int singleCh = 0;
+            String txt = "";
+            while((singleCh=fileReader.read())!=-1){
+                txt+=(char)singleCh;
+            }
+            fileReader.close();
+            return new ResponseEntity<>(txt,HttpStatus.OK);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
     //이미지 읽어오기
     public ResponseEntity readImage(String member_id, String dir, String image_name) {
         String path =rootPath +member_id+"/"+ dir+ image_name;
@@ -391,5 +431,38 @@ public class FileService {
         }
     }
 
+    public ResponseEntity<AttributesResponse> getAttribute(Long member_id, String file) {
+        Path getFile = Paths.get(rootPath+file);
+        System.out.println(getFile);
+        AttributesResponse attributesResponse = new AttributesResponse();
 
+        try {
+
+            // 파일 속성 찾기
+            Map<String, Object> getResult
+                    = Files.readAttributes(getFile, "*");
+            System.out.println("!");
+            FileTime creationTime = (FileTime) getResult.get("creationTime");
+            FileTime lastAccessTime = (FileTime) getResult.get("lastAccessTime");
+            FileTime lastModifiedTime = (FileTime) getResult.get("lastModifiedTime");
+            System.out.println("2");
+            System.out.println(creationTime);
+
+
+            attributesResponse = AttributesResponse.builder()
+                    .code(HttpStatus.OK.value())
+                    .httpStatus(HttpStatus.OK)
+                    .message("상세정보 열람 생성")
+                    .size(attributesResponse.getSize())
+                    .lastModifiedTime(String.valueOf(lastModifiedTime))
+                    .lastAccessTime(String.valueOf(lastAccessTime))
+                    .creationTime(String.valueOf(creationTime))
+                    .build();
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(attributesResponse, attributesResponse.getHttpStatus());
+    }
 }

@@ -131,12 +131,20 @@ public class FileController {
         return fileService.playVideo(member_id,dir,videoname);
     }
 
-    /*@GetMapping("/getAttribute")
+    @GetMapping("/file")
+    public ResponseEntity<?> readFile(HttpServletRequest request,
+                                      @RequestParam String dir,
+                                      @RequestParam String filename){
+        String accessToken = request.getHeader("accessToken");
+        String member_id = jwtProvider.getMemberIdFromToken(accessToken);
+        return fileService.readFile(Long.valueOf(member_id),dir,filename);
+    }
+    @GetMapping("/getAttribute")
     public ResponseEntity<AttributesResponse> getAttribute(HttpServletRequest request,
                                                            @RequestParam("file") String file) throws IOException {
         String accessToken = request.getHeader("accessToken");
         String member_id = jwtProvider.getMemberIdFromToken(accessToken);
         return fileService.getAttribute(Long.valueOf(member_id), file);
-    }*/
+    }
 
 }
