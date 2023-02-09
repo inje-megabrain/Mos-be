@@ -10,6 +10,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -21,10 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class FileService {
@@ -132,11 +130,11 @@ public class FileService {
     }
 
     public ResponseEntity<BasicResponse> renameDir(String member_id, String dir, String rename) {  //폴더 이름 변경
-        File newDir = new File(rootPath+dir);
+        File newDir = new File(rootPath+member_id+dir);
 
         BasicResponse basicResponse = new BasicResponse();
 
-        File changeFile = new File(rootPath, rename); //변경할 이름
+        File changeFile = new File(rootPath+member_id, rename); //변경할 이름
         System.out.println(newDir);
         System.out.println(changeFile);
         if (newDir.exists()) {    // 파일이 존재할 때만 이름 변경
@@ -270,23 +268,28 @@ public class FileService {
     }
 
     //파일업로드드
-    public ResponseEntity uploadFile(String member_id, String dir, List<MultipartFile> files) {
+    public ResponseEntity uploadFile(String member_id, String dir, MultipartHttpServletRequest mhsr) {
         String response = new String();
-        
-        for(MultipartFile file:files){
-            if (!file.isEmpty()) {
-                try {
-                    file.transferTo(new File(rootPath +member_id+ dir+"/" + file.getOriginalFilename()));
-                    response = file.getOriginalFilename();
-                } catch (IOException e) {
-                    response = "파일 업로드 실패";
-                    throw new RuntimeException(e);
+        Iterator<String> fileNames = mhsr.getFileNames();
+        List<MultipartFile> files = new ArrayList<>();
+        while(fileNames.hasNext())files.add(mhsr.getFile(fileNames.next()));
+        if(files.isEmpty()) response = "파일이 비었음";
+        else {
+            for (MultipartFile file : files) {
+                if (!file.isEmpty()) {
+                    try {
+                        file.transferTo(new File(rootPath + member_id + dir +"/"+ file.getOriginalFilename()));
+                        System.out.println(rootPath + member_id + dir + "/" + file.getOriginalFilename());
+                        response = file.getOriginalFilename();
+                    } catch (IOException e) {
+                        response = "파일 업로드 실패";
+                        throw new RuntimeException(e);
+                    }
+                } else {
+                    response = "파일이 비어있음";
                 }
-            } else {
-                response = "파일이 비어있음";
             }
         }
-
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -110,11 +111,10 @@ public class FileController {
     @PostMapping("/upload")
     public ResponseEntity<?> uploadFile(HttpServletRequest request,
                                         @RequestParam("dir") String dir,
-                                        @RequestParam("file") List<MultipartFile> files){
+                                        MultipartHttpServletRequest mhsr){
         String accessToken = request.getHeader("accessToken");
         String member_id = jwtProvider.getIdFromToken(accessToken);
-        System.out.println(files.size()+"");
-        return fileService.uploadFile(member_id,dir,files);
+        return fileService.uploadFile(member_id,dir,mhsr);
     }
 
     @GetMapping("/image")
