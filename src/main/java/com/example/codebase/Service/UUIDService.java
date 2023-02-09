@@ -29,29 +29,25 @@ public class UUIDService {
                 .code(HttpStatus.OK.value())
                 .httpStatus(HttpStatus.OK)
                 .message("UUID: "+share.getUuid())
-                .accessToken("")
-                .refreshToken("")
-                .result(null)
-                .count(1).build();
+                .build();
 
         return new ResponseEntity<>(basicResponse, basicResponse.getHttpStatus());
     }
 
-    public ResponseEntity<BasicResponse> getUUID(String uuid, String path) {
+    public ResponseEntity<BasicResponse> getUUID(String member_id, Long uuid, String path) {
         Share share = shareRepository.findById(uuid).orElseGet(Share::new);
 
         BasicResponse basicResponse = new BasicResponse();
 
-        if(share.getUri().equals(path)) {
+        String check = member_id+path;
+
+        if(share.getUri().equals(check)) {
 
             basicResponse = BasicResponse.builder()
                     .code(HttpStatus.OK.value())
                     .httpStatus(HttpStatus.OK)
                     .message("성공")
-                    .accessToken("")
-                    .refreshToken("")
-                    .result(null)
-                    .count(1).build();
+                    .build();
         }
         return new ResponseEntity<>(basicResponse, basicResponse.getHttpStatus());
 

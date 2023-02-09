@@ -140,14 +140,14 @@ public class FileController {
                                       @RequestParam String filename){
         String accessToken = request.getHeader("accessToken");
         String member_id = jwtProvider.getIdFromToken(accessToken);
-        return fileService.readFile(Long.valueOf(member_id),filename);
+        return fileService.readFile(member_id,filename);
     }
     @GetMapping("/getAttribute")
     public ResponseEntity<AttributesResponse> getAttribute(HttpServletRequest request,
                                                            @RequestParam("file") String file) throws IOException {
         String accessToken = request.getHeader("accessToken");
         String member_id = jwtProvider.getIdFromToken(accessToken);
-        return fileService.getAttribute(Long.valueOf(member_id), file);
+        return fileService.getAttribute(member_id, file);
     }
 
 }

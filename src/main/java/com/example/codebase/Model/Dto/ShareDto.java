@@ -8,6 +8,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class ShareDto {
-    private String uuid;
+    private Long uuid;
     private String uri;
 }
