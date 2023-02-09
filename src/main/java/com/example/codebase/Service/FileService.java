@@ -10,7 +10,9 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,16 +23,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class FileService {
 
-    public static String rootPath = "/Users/leeseonghyeon/Desktop/Mega/"; //root Path
-    //public static String rootPath = "/mos_file/"; //root Path
+
+    public static String rootPath = "/mos_file/"; //root Path
 
 
 
@@ -136,7 +135,7 @@ public class FileService {
 
         BasicResponse basicResponse = new BasicResponse();
 
-        File changeFile = new File(rootPath, rename); //변경할 이름
+        File changeFile = new File(rootPath+member_id, rename); //변경할 이름
         System.out.println(newDir);
         System.out.println(changeFile);
         if (newDir.exists()) {    // 파일이 존재할 때만 이름 변경
@@ -195,7 +194,28 @@ public class FileService {
                             .ext("jpg")
                             .build();
                     list.add(insert);
-                } else  {
+                } else if (file.getName().contains(".mp4")) {
+                    insert = getDirectory.builder()
+                            .isDir(false)
+                            .name(file.getName())
+                            .ext("mp4")
+                            .build();
+                    list.add(insert);
+                }else if (file.getName().contains(".avi")) {
+                    insert = getDirectory.builder()
+                            .isDir(false)
+                            .name(file.getName())
+                            .ext("avi")
+                            .build();
+                    list.add(insert);
+                }else if (file.getName().contains(".mov")) {
+                    insert = getDirectory.builder()
+                            .isDir(false)
+                            .name(file.getName())
+                            .ext("mov")
+                            .build();
+                    list.add(insert);
+                }else  {
                     insert = getDirectory.builder()
                             .isDir(true)
                             .name(file.getName())
@@ -242,13 +262,22 @@ public class FileService {
 
 
     public ResponseEntity moveDir(String member_id, String dir, String mv_dir) throws IOException {
-        File from = new File(rootPath + dir);
-        File to = new File(rootPath+mv_dir);
-        if(from.exists())
-        {
-            from.renameTo(to);	//이동
-        }
-        return new ResponseEntity<>(from.getName(),HttpStatus.OK);
+
+       
+
+        File from = new File(rootPath + member_id + dir);
+        File to = new File(rootPath+member_id+mv_dir+"/" +from.getName());
+        if(!to.isDirectory()&&from.exists()){
+            to.mkdir();
+            FileUtils.copyDirectory(from,to);
+            Files.walk(from.toPath())
+                    .sorted(Comparator.reverseOrder())
+                    .map(Path::toFile)
+                    .forEach(File::delete);
+                    }
+        else if(to.isDirectory()) return new ResponseEntity<>("이미 폴더가 존재함",HttpStatus.OK);
+        else return new ResponseEntity<>("존재하지 않는 폴더",HttpStatus.OK);
+        return new ResponseEntity<>("파일 이동 완료",HttpStatus.OK);
     }
 
     public ResponseEntity removeFile(String member_id, String file) {
@@ -266,23 +295,28 @@ public class FileService {
     }
 
     //파일업로드드
-    public ResponseEntity uploadFile(String member_id, String dir, List<MultipartFile> files) {
+    public ResponseEntity uploadFile(String member_id, String dir, MultipartHttpServletRequest mhsr) {
         String response = new String();
-        
-        for(MultipartFile file:files){
-            if (!file.isEmpty()) {
-                try {
-                    file.transferTo(new File(rootPath +member_id+ dir+"/" + file.getOriginalFilename()));
-                    response = file.getOriginalFilename();
-                } catch (IOException e) {
-                    response = "파일 업로드 실패";
-                    throw new RuntimeException(e);
+        Iterator<String> fileNames = mhsr.getFileNames();
+        List<MultipartFile> files = new ArrayList<>();
+        while(fileNames.hasNext())files.add(mhsr.getFile(fileNames.next()));
+        if(files.isEmpty()) response = "파일이 비었음";
+        else {
+            for (MultipartFile file : files) {
+                if (!file.isEmpty()) {
+                    try {
+                        file.transferTo(new File(rootPath + member_id + dir +"/"+ file.getOriginalFilename()));
+
+                        response = file.getOriginalFilename();
+                    } catch (IOException e) {
+                        response = "파일 업로드 실패";
+                        throw new RuntimeException(e);
+                    }
+                } else {
+                    response = "파일이 비어있음";
                 }
-            } else {
-                response = "파일이 비어있음";
             }
         }
-
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -418,5 +452,26 @@ public class FileService {
             e.printStackTrace();
         }
         return new ResponseEntity<>(attributesResponse, attributesResponse.getHttpStatus());
+    }
+
+    //다운로드
+    public ResponseEntity downloadFile(HttpServletResponse response, String member_id,String dir){
+        try{
+            File file = new File(rootPath + member_id + dir);
+            if(!file.isDirectory()){
+                response.setHeader("Content-Disposition","attachment;filename="+file.getName());
+                FileInputStream fileInputStream = new FileInputStream(rootPath+member_id+dir);
+                OutputStream out = response.getOutputStream();
+                int read =0;
+                byte[] buffer = new byte[1024];
+                while((read= fileInputStream.read(buffer))!= -1){
+                    out.write(buffer,0,read);
+                }
+                return new ResponseEntity<>("다운로드",HttpStatus.OK);
+            }
+        }catch(Exception e){
+
+        }
+        return new ResponseEntity<>("디렉토리는 다운로드 불가",HttpStatus.OK);
     }
 }

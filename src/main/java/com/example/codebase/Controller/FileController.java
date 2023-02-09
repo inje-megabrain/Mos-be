@@ -9,8 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.List;
@@ -110,19 +112,18 @@ public class FileController {
     @PostMapping("/upload")
     public ResponseEntity<?> uploadFile(HttpServletRequest request,
                                         @RequestParam("dir") String dir,
-                                        @RequestParam("file") List<MultipartFile> files){
+                                        MultipartHttpServletRequest mhsr){
         String accessToken = request.getHeader("accessToken");
         String member_id = jwtProvider.getIdFromToken(accessToken);
-        System.out.println(files.size()+"");
-        return fileService.uploadFile(member_id,dir,files);
+        return fileService.uploadFile(member_id,dir,mhsr);
     }
 
     @GetMapping("/image")
     public ResponseEntity<byte[]> readImage(HttpServletRequest request,
-                                       @RequestParam String imagepath){
+                                       @RequestParam String image_path){
         String accessToken = request.getHeader("accessToken");
         String member_id = jwtProvider.getIdFromToken(accessToken);
-        return fileService.readImage(member_id,imagepath);
+        return fileService.readImage(member_id,image_path);
     }
 
     @GetMapping("/video")
@@ -137,10 +138,12 @@ public class FileController {
 
     @GetMapping("/file")
     public ResponseEntity<?> readFile(HttpServletRequest request,
-                                      @RequestParam String filename){
+                                      @RequestParam String file_path){
         String accessToken = request.getHeader("accessToken");
         String member_id = jwtProvider.getIdFromToken(accessToken);
+
         return fileService.readFile(member_id,filename);
+
     }
     @GetMapping("/getAttribute")
     public ResponseEntity<AttributesResponse> getAttribute(HttpServletRequest request,
@@ -148,6 +151,15 @@ public class FileController {
         String accessToken = request.getHeader("accessToken");
         String member_id = jwtProvider.getIdFromToken(accessToken);
         return fileService.getAttribute(member_id, file);
+    }
+
+    @GetMapping("/downloadFile")
+    public ResponseEntity<?> downloadFile(HttpServletRequest request,
+                                          HttpServletResponse response,
+                                          @RequestParam String file){
+        String accessToken = request.getHeader("accessToken");
+        String member_id = jwtProvider.getIdFromToken(accessToken);
+        return fileService.downloadFile(response,member_id,file);
     }
 
 }
