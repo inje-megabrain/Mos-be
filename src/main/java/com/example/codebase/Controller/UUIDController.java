@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @RestController
 public class UUIDController {
@@ -20,6 +21,7 @@ public class UUIDController {
 
     @Autowired
     UUIDService uuidService;
+
 
     @PostMapping("/makeUUID")
     public ResponseEntity<BasicResponse> makeUUID(HttpServletRequest request,
@@ -38,4 +40,14 @@ public class UUIDController {
         String member_id = jwtProvider.getIdFromToken(accessToken);
         return uuidService.getUUID(member_id, uuid, path);
     }
+
+    @GetMapping("/downloadUUID")
+    public ResponseEntity<?> downloadUUID(HttpServletRequest request,
+                                          @RequestParam("UUID")Long uuid,
+                                          HttpServletResponse response){
+        String accessToken = request.getHeader("accessToken");
+        String member_id = jwtProvider.getIdFromToken(accessToken);
+        return uuidService.downloadUUID(response,uuid);
+    }
+
 }
