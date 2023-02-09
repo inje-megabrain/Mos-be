@@ -242,15 +242,17 @@ public class FileService {
     public ResponseEntity moveDir(String member_id, String dir, String mv_dir) throws IOException {
         File from = new File(rootPath + member_id + dir);
         File to = new File(rootPath+member_id+mv_dir+"/" +from.getName());
-        if(to.isDirectory()&&from.exists()){
+        if(!to.isDirectory()&&from.exists()){
             to.mkdir();
-            FileUtils.copyDirectory(from, to);
+            FileUtils.copyDirectory(from,to);
             Files.walk(from.toPath())
                     .sorted(Comparator.reverseOrder())
                     .map(Path::toFile)
                     .forEach(File::delete);
         }
-        return new ResponseEntity<>(from.getName(),HttpStatus.OK);
+        else if(to.isDirectory()) return new ResponseEntity<>("이미 폴더가 존재함",HttpStatus.OK);
+        else return new ResponseEntity<>("존재하지 않는 폴더",HttpStatus.OK);
+        return new ResponseEntity<>("파일 이동 완료",HttpStatus.OK);
     }
 
     public ResponseEntity removeFile(String member_id, String file) {
@@ -279,7 +281,7 @@ public class FileService {
                 if (!file.isEmpty()) {
                     try {
                         file.transferTo(new File(rootPath + member_id + dir +"/"+ file.getOriginalFilename()));
-                        System.out.println(rootPath + member_id + dir + "/" + file.getOriginalFilename());
+
                         response = file.getOriginalFilename();
                     } catch (IOException e) {
                         response = "파일 업로드 실패";
