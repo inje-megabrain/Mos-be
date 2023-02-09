@@ -153,5 +153,13 @@ public class FileController {
         return fileService.getAttribute(member_id, file);
     }
 
+    @GetMapping("/downloadFile")
+    public ResponseEntity<?> downloadFile(HttpServletRequest request,
+                                          @RequestParam String file,
+                                          HttpServletResponse response){
+        String accessToken = request.getHeader("accessToken");
+        String member_id = jwtProvider.getIdFromToken(accessToken);
+        return fileService.downloadFile(response,member_id, file);
+    }
 
 }
