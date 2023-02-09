@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.List;
@@ -148,6 +149,15 @@ public class FileController {
         String accessToken = request.getHeader("accessToken");
         String member_id = jwtProvider.getIdFromToken(accessToken);
         return fileService.getAttribute(Long.valueOf(member_id), file);
+    }
+
+    @GetMapping("/downloadFile")
+    public ResponseEntity<?> downloadFile(HttpServletRequest request,
+                                          HttpServletResponse response,
+                                          @RequestParam String file){
+        String accessToken = request.getHeader("accessToken");
+        String member_id = jwtProvider.getIdFromToken(accessToken);
+        return fileService.downloadFile(response,member_id,file);
     }
 
 }
