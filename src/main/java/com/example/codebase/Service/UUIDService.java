@@ -28,7 +28,7 @@ public class UUIDService {
         basicResponse = BasicResponse.builder()
                 .code(HttpStatus.OK.value())
                 .httpStatus(HttpStatus.OK)
-                .message("UUID: "+share.getUuid())
+                .message(Long.toString(share.getUuid()))
                 .build();
 
         return new ResponseEntity<>(basicResponse, basicResponse.getHttpStatus());
