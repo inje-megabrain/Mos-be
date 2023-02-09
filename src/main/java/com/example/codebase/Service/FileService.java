@@ -28,7 +28,7 @@ import java.util.*;
 @Service
 public class FileService {
 
-    //public static String rootPath = "C:/Users/mun/Desktop/파일저장테스트/"; //root Path
+
     public static String rootPath = "/mos_file/"; //root Path
 
 
@@ -262,6 +262,9 @@ public class FileService {
 
 
     public ResponseEntity moveDir(String member_id, String dir, String mv_dir) throws IOException {
+
+       
+
         File from = new File(rootPath + member_id + dir);
         File to = new File(rootPath+member_id+mv_dir+"/" +from.getName());
         if(!to.isDirectory()&&from.exists()){
@@ -271,14 +274,14 @@ public class FileService {
                     .sorted(Comparator.reverseOrder())
                     .map(Path::toFile)
                     .forEach(File::delete);
-        }
+                    }
         else if(to.isDirectory()) return new ResponseEntity<>("이미 폴더가 존재함",HttpStatus.OK);
         else return new ResponseEntity<>("존재하지 않는 폴더",HttpStatus.OK);
         return new ResponseEntity<>("파일 이동 완료",HttpStatus.OK);
     }
 
     public ResponseEntity removeFile(String member_id, String file) {
-        File rm_file = new File(rootPath +member_id+ file);
+        File rm_file = new File(rootPath + file);
         String response = new String();
         if (rm_file.exists() && rm_file.isFile()) {
             rm_file.delete();
@@ -362,7 +365,7 @@ public class FileService {
     }
 
     //텍스트 읽어오기
-    public ResponseEntity readFile(Long member_id,String filename){
+    public ResponseEntity readFile(String member_id,String filename){
         try {
             File file = new File(rootPath + member_id + filename);
             String ext = FilenameUtils.getExtension(file.getPath());
@@ -420,8 +423,8 @@ public class FileService {
         }
     }
 
-    public ResponseEntity<AttributesResponse> getAttribute(Long member_id, String file) {
-        Path getFile = Paths.get(rootPath+file);
+    public ResponseEntity<AttributesResponse> getAttribute(String member_id, String file) {
+        Path getFile = Paths.get(rootPath+member_id+file);
         System.out.println(getFile);
         AttributesResponse attributesResponse = new AttributesResponse();
 
@@ -430,13 +433,9 @@ public class FileService {
             // 파일 속성 찾기
             Map<String, Object> getResult
                     = Files.readAttributes(getFile, "*");
-            System.out.println("!");
             FileTime creationTime = (FileTime) getResult.get("creationTime");
             FileTime lastAccessTime = (FileTime) getResult.get("lastAccessTime");
             FileTime lastModifiedTime = (FileTime) getResult.get("lastModifiedTime");
-            System.out.println("2");
-            System.out.println(creationTime);
-
 
             attributesResponse = AttributesResponse.builder()
                     .code(HttpStatus.OK.value())

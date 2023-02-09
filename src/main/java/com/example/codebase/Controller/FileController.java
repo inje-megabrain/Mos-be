@@ -141,14 +141,16 @@ public class FileController {
                                       @RequestParam String file_path){
         String accessToken = request.getHeader("accessToken");
         String member_id = jwtProvider.getIdFromToken(accessToken);
-        return fileService.readFile(Long.valueOf(member_id),file_path);
+
+        return fileService.readFile(member_id,filename);
+
     }
     @GetMapping("/getAttribute")
     public ResponseEntity<AttributesResponse> getAttribute(HttpServletRequest request,
                                                            @RequestParam("file") String file) throws IOException {
         String accessToken = request.getHeader("accessToken");
         String member_id = jwtProvider.getIdFromToken(accessToken);
-        return fileService.getAttribute(Long.valueOf(member_id), file);
+        return fileService.getAttribute(member_id, file);
     }
 
     @GetMapping("/downloadFile")

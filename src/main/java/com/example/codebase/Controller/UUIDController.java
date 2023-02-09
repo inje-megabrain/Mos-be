@@ -31,8 +31,11 @@ public class UUIDController {
     }
 
     @GetMapping("/getUUID")
-    public ResponseEntity<BasicResponse> getUUID(@RequestParam("path") String path,
-                                                 @RequestParam("UUID") String uuid) {
-        return uuidService.getUUID(uuid, path);
+    public ResponseEntity<BasicResponse> getUUID(HttpServletRequest request,
+                                                 @RequestParam("path") String path,
+                                                 @RequestParam("UUID") Long uuid) {
+        String accessToken = request.getHeader("accessToken");
+        String member_id = jwtProvider.getIdFromToken(accessToken);
+        return uuidService.getUUID(member_id, uuid, path);
     }
 }
