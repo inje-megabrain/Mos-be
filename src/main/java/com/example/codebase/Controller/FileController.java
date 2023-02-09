@@ -119,10 +119,10 @@ public class FileController {
 
     @GetMapping("/image")
     public ResponseEntity<byte[]> readImage(HttpServletRequest request,
-                                       @RequestParam String imagepath){
+                                       @RequestParam String image_path){
         String accessToken = request.getHeader("accessToken");
         String member_id = jwtProvider.getIdFromToken(accessToken);
-        return fileService.readImage(member_id,imagepath);
+        return fileService.readImage(member_id,image_path);
     }
 
     @GetMapping("/video")
@@ -137,10 +137,10 @@ public class FileController {
 
     @GetMapping("/file")
     public ResponseEntity<?> readFile(HttpServletRequest request,
-                                      @RequestParam String filename){
+                                      @RequestParam String file_path){
         String accessToken = request.getHeader("accessToken");
         String member_id = jwtProvider.getIdFromToken(accessToken);
-        return fileService.readFile(Long.valueOf(member_id),filename);
+        return fileService.readFile(Long.valueOf(member_id),file_path);
     }
     @GetMapping("/getAttribute")
     public ResponseEntity<AttributesResponse> getAttribute(HttpServletRequest request,
