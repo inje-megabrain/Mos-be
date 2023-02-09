@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -30,9 +31,7 @@ public class FileService {
 
 
     public static String rootPath = "/mos_file/"; //root Path
-
-
-
+    //public static String rootPath = "C:/Users/mun/Desktop/파일저장테스트/";
 
     public ResponseEntity<BasicResponse> makeDir(String member_id, String dir) {   //폴더 생성
 
@@ -281,7 +280,7 @@ public class FileService {
     }
 
     public ResponseEntity removeFile(String member_id, String file) {
-        File rm_file = new File(rootPath + file);
+        File rm_file = new File(rootPath+member_id + file);
         String response = new String();
         if (rm_file.exists() && rm_file.isFile()) {
             rm_file.delete();
@@ -456,21 +455,20 @@ public class FileService {
 
     //다운로드
     public ResponseEntity downloadFile(HttpServletResponse response, String member_id,String dir){
-        try{
+        try {
             File file = new File(rootPath + member_id + dir);
-            if(!file.isDirectory()){
-                response.setHeader("Content-Disposition","attachment;filename="+file.getName());
-                FileInputStream fileInputStream = new FileInputStream(rootPath+member_id+dir);
-                OutputStream out = response.getOutputStream();
-                int read =0;
-                byte[] buffer = new byte[1024];
-                while((read= fileInputStream.read(buffer))!= -1){
-                    out.write(buffer,0,read);
-                }
-                return new ResponseEntity<>("다운로드",HttpStatus.OK);
-            }
-        }catch(Exception e){
+            byte fileByte[] = FileUtils.readFileToByteArray(file);
+            response.setContentType("application/octet-stream");
+            response.setContentLength(fileByte.length);
 
+            response.setHeader("Content-Disposion","attach; fileName=\""+ URLEncoder.encode(file.getName(),"UTF-8")+"\";");
+            response.setHeader("Content-Transfer-Encoding","binary");
+
+            response.getOutputStream().write(fileByte);
+            response.getOutputStream().flush();
+            response.getOutputStream().close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
         return new ResponseEntity<>("디렉토리는 다운로드 불가",HttpStatus.OK);
     }

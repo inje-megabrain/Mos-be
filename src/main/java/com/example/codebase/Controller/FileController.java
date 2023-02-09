@@ -142,7 +142,7 @@ public class FileController {
         String accessToken = request.getHeader("accessToken");
         String member_id = jwtProvider.getIdFromToken(accessToken);
 
-        return fileService.readFile(member_id,filename);
+        return fileService.readFile(member_id,file_path);
 
     }
     @GetMapping("/getAttribute")
