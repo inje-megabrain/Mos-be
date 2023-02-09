@@ -29,8 +29,8 @@ import java.util.Map;
 @Service
 public class FileService {
 
-    //public static String rootPath = "/Users/leeseonghyeon/Desktop/Mega/"; //root Path
-    public static String rootPath = "/mos_file/"; //root Path
+    public static String rootPath = "C:/Users/mun/Desktop/파일저장테스트/"; //root Path
+    //public static String rootPath = "/mos_file/"; //root Path
 
 
 
@@ -241,63 +241,18 @@ public class FileService {
 
 
 
-    public ResponseEntity<BasicResponse> moveDir(String member_id, String dir, String mv_dir) throws IOException {
-        BasicResponse basicResponse = new BasicResponse();
-
-        char[] ch = dir.toCharArray();
-
-        int cnt=0;
-
-        for(int i=ch.length-1; i>=0; i--){
-            if(ch[i]=='/'){
-                cnt=i+1;
-                break;
-            }
+    public ResponseEntity moveDir(String member_id, String dir, String mv_dir) throws IOException {
+        File from = new File(rootPath + member_id + dir);
+        File to = new File(rootPath+member_id+mv_dir+"/" +from.getName());
+        if(to.isDirectory()&&from.exists()){
+            to.mkdir();
+            FileUtils.copyDirectory(from, to);
+            Files.walk(from.toPath())
+                    .sorted(Comparator.reverseOrder())
+                    .map(Path::toFile)
+                    .forEach(File::delete);
         }
-        char[] result= new char[ch.length-cnt];
-
-        for(int i=cnt; i<ch.length; i++) {
-            result[i-cnt]=ch[i];
-        }
-
-        String path = String.valueOf(result);
-
-        File from = new File(rootPath +dir);
-        File to = new File(rootPath + dir+path);
-        System.out.println(from);
-        System.out.println(to);
-            try {
-                if(from.isFile()){
-                    System.out.println("!");
-                    FileUtils.copyFile(from, to);
-                    FileUtils.deleteQuietly(from);
-                }
-                else {
-                    FileUtils.copyDirectory(from, to);
-                    FileUtils.deleteDirectory(from);
-
-                }
-                basicResponse = BasicResponse.builder()
-                        .code(HttpStatus.OK.value())
-                        .httpStatus(HttpStatus.OK)
-                        .message("파일 이동 완료")
-                        .accessToken("")
-                        .refreshToken("")
-                        .result(null)
-                        .count(1).build();
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-                basicResponse = BasicResponse.builder()
-                        .code(HttpStatus.BAD_REQUEST.value())
-                        .httpStatus(HttpStatus.BAD_REQUEST)
-                        .message("파일 이동 실패")
-                        .accessToken("")
-                        .refreshToken("")
-                        .result(null).count(1).build();
-            }
-
-
-        return new ResponseEntity<>(basicResponse, basicResponse.getHttpStatus());
+        return new ResponseEntity<>(from.getName(),HttpStatus.OK);
     }
 
     public ResponseEntity removeFile(String member_id, String file) {
@@ -317,11 +272,12 @@ public class FileService {
     //파일업로드드
     public ResponseEntity uploadFile(String member_id, String dir, List<MultipartFile> files) {
         String response = new String();
-        for(int i=0;i<files.size();i++){
-            if (!files.get(i).isEmpty()) {
+        
+        for(MultipartFile file:files){
+            if (!file.isEmpty()) {
                 try {
-                    files.get(i).transferTo(new File(rootPath +member_id+ dir+"/" + files.get(i).getOriginalFilename()));
-                    response = files.get(i).getOriginalFilename();
+                    file.transferTo(new File(rootPath +member_id+ dir+"/" + file.getOriginalFilename()));
+                    response = file.getOriginalFilename();
                 } catch (IOException e) {
                     response = "파일 업로드 실패";
                     throw new RuntimeException(e);

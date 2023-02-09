@@ -7,10 +7,7 @@ import com.example.codebase.Service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -76,7 +73,7 @@ public class FileController {
 
 
     @PostMapping("/moveDir")
-    public ResponseEntity<BasicResponse> getDir(HttpServletRequest request,
+    public ResponseEntity<?> moveDir(HttpServletRequest request,
                                                 @RequestParam("dir") String dir,
                                                 @RequestParam("mv_dir") String mv_dir) throws IOException {
         String accessToken = request.getHeader("accessToken");
@@ -116,6 +113,7 @@ public class FileController {
                                         @RequestParam("file") List<MultipartFile> files){
         String accessToken = request.getHeader("accessToken");
         String member_id = jwtProvider.getIdFromToken(accessToken);
+        System.out.println(files.size()+"");
         return fileService.uploadFile(member_id,dir,files);
     }
 
