@@ -27,8 +27,8 @@ import java.util.*;
 @Service
 public class FileService {
 
-    public static String rootPath = "C:/Users/mun/Desktop/파일저장테스트/"; //root Path
-    //public static String rootPath = "/mos_file/"; //root Path
+    //public static String rootPath = "C:/Users/mun/Desktop/파일저장테스트/"; //root Path
+    public static String rootPath = "/mos_file/"; //root Path
 
 
 
@@ -193,7 +193,28 @@ public class FileService {
                             .ext("jpg")
                             .build();
                     list.add(insert);
-                } else  {
+                } else if (file.getName().contains(".mp4")) {
+                    insert = getDirectory.builder()
+                            .isDir(false)
+                            .name(file.getName())
+                            .ext("mp4")
+                            .build();
+                    list.add(insert);
+                }else if (file.getName().contains(".avi")) {
+                    insert = getDirectory.builder()
+                            .isDir(false)
+                            .name(file.getName())
+                            .ext("avi")
+                            .build();
+                    list.add(insert);
+                }else if (file.getName().contains(".mov")) {
+                    insert = getDirectory.builder()
+                            .isDir(false)
+                            .name(file.getName())
+                            .ext("mov")
+                            .build();
+                    list.add(insert);
+                }else  {
                     insert = getDirectory.builder()
                             .isDir(true)
                             .name(file.getName())
