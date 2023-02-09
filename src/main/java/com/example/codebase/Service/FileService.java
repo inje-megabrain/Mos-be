@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -452,5 +453,26 @@ public class FileService {
             e.printStackTrace();
         }
         return new ResponseEntity<>(attributesResponse, attributesResponse.getHttpStatus());
+    }
+
+    //다운로드
+    public ResponseEntity downloadFile(HttpServletResponse response, String member_id,String dir){
+        try{
+            File file = new File(rootPath + member_id + dir);
+            if(!file.isDirectory()){
+                response.setHeader("Content-Disposition","attachment;filename="+file.getName());
+                FileInputStream fileInputStream = new FileInputStream(rootPath+member_id+dir);
+                OutputStream out = response.getOutputStream();
+                int read =0;
+                byte[] buffer = new byte[1024];
+                while((read= fileInputStream.read(buffer))!= -1){
+                    out.write(buffer,0,read);
+                }
+                return new ResponseEntity<>("다운로드",HttpStatus.OK);
+            }
+        }catch(Exception e){
+
+        }
+        return new ResponseEntity<>("디렉토리는 다운로드 불가",HttpStatus.OK);
     }
 }
