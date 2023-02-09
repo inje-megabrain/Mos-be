@@ -15,6 +15,7 @@ import javax.persistence.*;
 public class Share {
     @Id
     @Column(name = "uuid")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String uuid;
 
     @Column(name = "uri")

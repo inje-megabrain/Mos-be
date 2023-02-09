@@ -421,7 +421,7 @@ public class FileService {
     }
 
     public ResponseEntity<AttributesResponse> getAttribute(Long member_id, String file) {
-        Path getFile = Paths.get(rootPath+file);
+        Path getFile = Paths.get(rootPath+member_id+file);
         System.out.println(getFile);
         AttributesResponse attributesResponse = new AttributesResponse();
 
