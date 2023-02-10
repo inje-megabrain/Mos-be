@@ -68,6 +68,7 @@ public class UUIDService {
                 response.setContentType("application/octet-stream");
                 response.setContentLength(fileByte.length);
 
+
                 response.setHeader("Content-Disposion","attach; fileName=\""+ URLEncoder.encode(file.getName(),"UTF-8")+"\";");
                 response.setHeader("Content-Transfer-Encoding","binary");
 

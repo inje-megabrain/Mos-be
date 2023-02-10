@@ -30,8 +30,8 @@ import java.util.*;
 public class FileService {
 
 
-    public static String rootPath = "/mos_file/"; //root Path
-    //public static String rootPath = "C:/Users/mun/Desktop/파일저장테스트/";
+    //public static String rootPath = "/mos_file/"; //root Path
+    public static String rootPath = "C:/Users/mun/Desktop/파일저장테스트/";
 
     public ResponseEntity<BasicResponse> makeDir(String member_id, String dir) {   //폴더 생성
 
@@ -266,19 +266,14 @@ public class FileService {
 
         File from = new File(rootPath + member_id + dir);
         File to = new File(rootPath+member_id+mv_dir+"/" +from.getName());
-        if(to.isDirectory()&&from.exists()&& !to.exists()){
-            to.mkdir();
-            FileUtils.copyDirectory(from,to);
-            Files.walk(from.toPath())
-                    .sorted(Comparator.reverseOrder())
-                    .map(Path::toFile)
-                    .forEach(File::delete);
-                    }
-        else if(to.isDirectory()) return new ResponseEntity<>("이미 폴더가 존재함",HttpStatus.OK);
-        else if(to.isFile()&&from.exists()&&!to.exists()){
+        if(from.isDirectory()&&from.exists()&& !to.exists()){
+            FileUtils.moveDirectory(from,to);
+        }
+        else if(to.exists()) return new ResponseEntity<>("이미 폴더가 존재함",HttpStatus.OK);
+        else if(!to.exists()){
             FileUtils.moveFile(from,to);
         }
-        else return new ResponseEntity<>("존재하지 않는 파일",HttpStatus.OK);
+        else return new ResponseEntity<>(from.getPath() + "\n" + to.getPath(),HttpStatus.OK);
         return new ResponseEntity<>("파일 이동 완료",HttpStatus.OK);
     }
 
