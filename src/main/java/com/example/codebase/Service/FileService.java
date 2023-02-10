@@ -30,8 +30,8 @@ import java.util.*;
 public class FileService {
 
 
-    //public static String rootPath = "/mos_file/"; //root Path
-    public static String rootPath = "C:/Users/mun/Desktop/파일저장테스트/";
+    public static String rootPath = "/mos_file/"; //root Path
+    //public static String rootPath = "C:/Users/mun/Desktop/파일저장테스트/";
 
     public ResponseEntity<BasicResponse> makeDir(String member_id, String dir) {   //폴더 생성
 
